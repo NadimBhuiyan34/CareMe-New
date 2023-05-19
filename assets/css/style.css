@@ -1,4 +1,4 @@
-/**
+ /**
 * Template Name: NiceAdmin
 * Updated: Mar 09 2023 with Bootstrap v5.2.3
 * Template URL: https://bootstrapmade.com/nice-admin-bootstrap-admin-html-template/
@@ -43,13 +43,13 @@ h6 {
 --------------------------------------------------------------*/
 #main {
   margin-top: 40px;
-  padding: 10px 20px;
+  padding: 20px 30px;
   transition: all 0.3s;
 }
 
 @media (max-width: 1199px) {
   #main {
-    padding: 10px;
+    padding: 20px;
   }
 }
 
@@ -57,7 +57,7 @@ h6 {
 # Page Title
 --------------------------------------------------------------*/
 .pagetitle {
-  margin-bottom: 5px;
+  margin-bottom: 10px;
 }
 
 .pagetitle h1 {

@@ -6,7 +6,6 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
 
-
  if(isset($_POST['submit']))
  {
 
@@ -67,76 +66,53 @@ try{
    }
    
   //  random passowrd
-    $password_length = 8;
-        $random_password = '';
-        $char_range = array_merge(range('a', 'z'), range('A', 'Z'), range(0, 9));
-        for ($i = 0; $i < $password_length; $i++) {
-            $random_password .= $char_range[rand(0, count($char_range) - 1)];
-        }
+   
 
-   $email = $_POST['email'];
+ 
    $fname=$_POST['name'];
+
+   $is_varify=$_POST['is_varify'];
+    $is_verify=$is_varify==1?'1':'0';
+   $email=$_POST['email'];
    $address=$_POST['address'];
    $birth=$_POST['birth'];
    $proffession=$_POST['proffession'];
    $mobile=$_POST['mobile'];
    $about=$_POST['about'];
-   $device=$_POST['device'];
-   $image=$newFileName??'profile.png';
-   $userpassword=md5($random_password);
-   $role= 'patient';
-   $v_code=bin2hex(random_bytes(16));
+   $image=$newFileName??$_POST['currentImage'];
    $ret=mysqli_query($con,"select id from tbluserregistration where emailid='$email'");
     $result=mysqli_num_rows($ret);
-    
-   if($result==0){
+    $data=mysqli_fetch_assoc($ret);
+    $user_id=$data['id'];
+   if($result>0){
+        
+   $userSql= "UPDATE `tbluserregistration` SET `fullName`='$fname',`is_varify`='$is_verify' WHERE emailid = '$email'";
 
-     $mail=sendMail($email,$v_code,$random_password,$fname);
-     if($mail)
-     {
-              $query="INSERT INTO `tbluserregistration`( `fullName`, `emailid`, `device`, `loginPassword`, `role`, `varification_code`, `is_varify`) VALUES ('$fname','$email','$device','$userpassword','$role','$v_code','0')";
-              $user_registration= mysqli_query($con, $query);
-    
-    
-       
-              $ret=mysqli_query($con,"select id from tbluserregistration where emailid='$email'");
-        // $user = mysqli_query($con, $ret);
-       
-         $row = mysqli_fetch_assoc( $ret);
-         $user_id = $row['id'];
-    // $user_id = 1;
-  
-      $sql = "INSERT INTO `profiles`(`user_id`, `address`, `mobileNumber`, `date_of_birth`, `about`, `image`, `proffession`) VALUES ('$user_id','$address','$mobile','$birth','$about','$image','$proffession')";
-      $profile = mysqli_query($con,$sql);
-       if($user_registration &&  $profile)
-         {
-          session_start(); 
-          $_SESSION['success'] = array('message' => "Registration Successfull!", 'type' => "success",'icon'=>"fa-square-check");
+   $profileSql=" UPDATE `profiles` SET `address`='$address',`mobileNumber`='$mobile',`date_of_birth`='$birth',`about`='$about',`image`='$image',`proffession`='$proffession' WHERE user_id = $user_id";
+     $user_update= mysqli_query($con, $userSql);
+
+      if(mysqli_query($con, $userSql) &&   mysqli_query($con, $profileSql))
+   {
+           session_start(); 
+     $_SESSION['success'] = array('message' => "Profile update Successfull!", 'type' => "success",'icon'=>"fa-square-check");
 
       // Redirect to some page where you want to show the success message
-          header("Location: ../../view/admin/patient-registration.php");
+      header("Location: ../../view/admin/patient-index.php");
            exit();
-          }
-          else
-          {
-                   session_start(); 
-            $_SESSION['success'] = array('message' => "Something is wrong", 'type' => "danger",'icon'=>"fa-triangle-exclamation");
+   }
+   else
+   {
+      session_start(); 
+     $_SESSION['success'] = array('message' => "Profile update Fail!",'type' => "danger",'icon'=>"fa-triangle-exclamation");
 
       // Redirect to some page where you want to show the success message
-             header("Location: ../../view/admin/patient-registration.php");
-              exit();
-          }
-     }
-   
-    else
-    {
-         
-          session_start(); 
-        $_SESSION['success'] = array('message' => "Registration Fail!", 'type' => "danger",'icon'=>"fa-triangle-exclamation");
-      // Redirect to some page where you want to show the success message
-      header("Location: ../../view/admin/patient-registration.php");
-           exit();  
-    }
+        header("Location: ../../view/admin/patient-index.php");
+           exit();
+   }
+     
+    //  $mail=sendMail($email,$v_code,$random_password,$fname);
+    
+ 
       
          
 
@@ -145,9 +121,9 @@ else
 {
      session_start(); 
      
-     $_SESSION['success'] = array('message' => "This email is already taken", 'type' => "danger",'icon'=>"fa-triangle-exclamation");
+     $_SESSION['success'] = array('message' => "This data is not available", 'type' => "danger",'icon'=>"fa-triangle-exclamation");
       // Redirect to some page where you want to show the success message
-      header("Location: ../../view/admin/patient-registration.php");
+     header("Location: ../../view/admin/patient-index.php");
           exit();
 }
  
@@ -172,7 +148,7 @@ if (strlen($_SESSION['user']['id']) == 0) {
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-  <title>Admin-Patient</title>
+  <title>Admin-PtientEdit</title>
   <meta content="" name="description">
   <meta content="" name="keywords">
 
@@ -220,7 +196,7 @@ if (strlen($_SESSION['user']['id']) == 0) {
   <main id="main" class="main">
    <div class="d-flex justify-content-between pt-3">
     <div class="pagetitle">
-      <h1>Patient</h1>
+      <h1>Patient Edit</h1>
    
       <nav>
         <ol class="breadcrumb">
@@ -234,59 +210,79 @@ if (strlen($_SESSION['user']['id']) == 0) {
         <img src="../../assets/img/logo4.png" alt="" style="height:40px; width:90px" class="mx-auto">
     </div>
   </div>
-  <?php include_once('../../includes/alert-message.php'); ?>
-    
+  
     <!-- End Page Title -->
      <div class="card">
         <div class="card-header bg-primary text-white text-center mb-2">
-            <h6>Patient Registration</h6>
+            <h6>Edit Patient Profile</h6>
         </div>
+    <?php 
+       $id=$_GET['id'];
+       
+   $patientSql = "SELECT *
+              FROM tbluserregistration
+              JOIN profiles ON tbluserregistration.id = profiles.user_id
+              WHERE emailid ='$id'";
+      $users= mysqli_query($con, $patientSql); 
+      $row = mysqli_fetch_assoc($users);
+      
+      ?>
         <div class="card-body ">
            <form class="row g-3" method="POST"  enctype="multipart/form-data">
                 <div class="col-12 col-lg-6">
                   <label for="inputNanme" class="form-label">Patient Name</label>
-                  <input type="text" class="form-control" id="inputNanme" name="name" required>
+                  <input type="text" class="form-control" id="inputNanme" name="name" required value="<?php echo $row['fullName'] ?>">
                 </div>
                 <div class="col-12 col-lg-6">
                
-                       <label for="inputNanme0" class="form-label">Image</label>
-                  <input type="file" class="form-control" id="inputNanme0" name="image"> 
+                   <img src="../../assets/profile/<?php echo $row['image'] ?>" alt="Profile" style="width:70px; height:70px" id="preview-image">
+                        
+                        <label class=" bg-primary rounded-2" for="inputGroupFile01" id="upload-label">
+                           <img src="https://cdn.pixabay.com/photo/2016/01/03/00/43/upload-1118929_1280.png" alt="" style="width:70px;height:70px">
+                           </label>
+                        <input type="file" class="form-control mx-auto" id="inputGroupFile01" style="display:none" onchange="previewImage()" name="image">
+                           
                   
                 </div>
+ 
+                 
+                  <input type="hidden" class="form-control" id="inputEmail1" name="email" value="<?php echo $row['emailid'] ?>">
+                  <input type="hidden" class="form-control" id="inputEmail1" name="currentImage" value="<?php echo $row['image'] ?>">
 
-                <div class="col-12 col-lg-6">
-                  <label for="inputEmail1" class="form-label">Email</label>
-                  <input type="email" class="form-control" id="inputEmail1" name="email" required>
-                </div>
-                <div class="col-12 col-lg-6">
-                  <label for="inputdeive" class="form-label">Device Id</label>
-                  <input type="text" class="form-control" id="inputdevice" name="device" required>
-                </div>
-                <div class="col-12 col-lg-6">
-                  <label for="inputNanme3" class="form-label">Mobile</label>
-                  <input type="text" class="form-control" id="inputNanme3" name="mobile">
-                </div>
+            
                   <div class="col-12 col-lg-6">
                   <label for="inputNanme2" class="form-label">Date of Birth</label>
-                  <input type="date" class="form-control" id="inputNanme2" name="birth">
+                  <input type="date" class="form-control" id="inputNanme2" name="birth" value="<?php echo $row['date_of_birth'] ?>">
                 </div>
-                 
-                 <div class="col-12 col-lg-6">
-                  <label for="inputNanme4" class="form-label">Address</label>
-                  <input type="text" class="form-control" id="inputNanme4" name="address">
+                <div class="col-12">
+                  <label for="inputAddress" class="form-label">Mobile</label>
+                  <input type="text" class="form-control" id="inputAddress" name="mobile" value="<?php echo $row['mobileNumber'] ?>">
                 </div>
                  <div class="col-12 col-lg-6">
-                  <label for="inputNanme5" class="form-label">Proffession</label>
-                  <input type="text" class="form-control" id="inputNanme5" name="proffession">
+                  <label for="inputNanme3" class="form-label">Address</label>
+                  <input type="text" class="form-control" id="inputNanme3" name="addreess" value="<?php echo $row['address'] ?>">
+                </div>
+                 <div class="col-12 col-lg-6">
+                  <label for="inputNanme4" class="form-label">Profession</label>
+                  <input type="text" class="form-control" id="inputNanme4" name="profession" value="<?php echo $row['proffession'] ?>">
+                </div>
+                 <div class="col-12 col-lg-6">
+                  <label for="inputNanme5" class="form-label">About</label>
+                    <textarea class="form-control" style="height: 100px" id="inputabout" name="about" ><?php echo $row['about'] ?></textarea>
                 </div>
                
+                
                 <div class="col-12">
-                  <label for="inputabout" class="form-label">About</label>
-                  <textarea class="form-control" style="height: 100px" id="inputabout" name="about"></textarea>
+                     <label for="inputAddress" class="form-label">Account Status</label>
+                   <div class="form-check form-switch">
+                      <input class="form-check-input" type="checkbox" name="is_varify" value="1" id="flexSwitchCheckChecked" <?php echo $row['is_varify']==1?'checked':'' ?>>
+                        
+                       <label class="form-check-label" for="flexSwitchCheckChecked"><?php echo $row['is_varify']?'Active':'InActive' ?></label>
+                    </div>
                 </div>
                 <div class="text-center">
-                  <button type="submit" class="btn btn-primary" name="submit">Submit</button>
-                  <button type="reset" class="btn btn-secondary">Reset</button>
+                  <button type="submit" class="btn btn-primary" name="submit">Save Change</button>
+                  
                 </div>
      </form>
         </div>
@@ -312,7 +308,34 @@ if (strlen($_SESSION['user']['id']) == 0) {
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
     <script src="../../assets/js/jquery-3.6.0.min.js"></script>
  
+    <script>
+  var checkbox = document.getElementById('flexSwitchCheckChecked');
+  var hiddenInput = document.querySelector('input[name="is_varify"]');
 
+  checkbox.addEventListener('change', function() {
+    hiddenInput.value = this.checked ? '1' : '0';
+  });
+</script>
+
+   <script>
+   function previewImage() {
+  var preview = document.getElementById('preview-image');
+  var fileInput = document.getElementById('inputGroupFile01');
+  var file = fileInput.files[0];
+  var reader = new FileReader();
+  reader.onloadend = function () {
+    preview.src = reader.result;
+  }
+  if (file) {
+    reader.readAsDataURL(file);
+  } else {
+    preview.src = "{{ asset('storage/profiles').'/'.$user->profile->image }}";
+  }
+}
+ 
+    
+    
+</script>  
 
 
  

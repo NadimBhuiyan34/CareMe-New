@@ -6,73 +6,7 @@ require '../../vendor/autoload.php';
  
 include_once('../../includes/config.php');
 
-if (isset($_POST['update'])) 
-
-{
-      if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
-    $tempFilePath = $_FILES['image']['tmp_name'];
-    $originalFileName = $_FILES['image']['name'];
-    
-    // Generate a unique identifier
-    $uniqueId = uniqid();
-    
-    // Extract the file extension from the original file name
-    $fileExtension = pathinfo($originalFileName, PATHINFO_EXTENSION);
-    
-    // Create the new file name by combining the unique identifier and the file extension
-    $newFileName = $uniqueId . '.' . $fileExtension;
-    
-    $newFilePath = '../../assets/profile/' . $newFileName;
-    
-    move_uploaded_file($tempFilePath, $newFilePath) ;
-      // Image upload successful
-   }
-
-    $adid=$_SESSION['user']['id'];
-//   $query="SELECT *
-//      FROM tbluserregistration
-//      JOIN profiles ON tbluserregistration.id = profiles.user_id  WHERE tbluserregistration.id = $adid";
-
-// $ret1=mysqli_query($con,$query);
-//  $row = mysqli_fetch_assoc($ret1);
-
-   $email = $_POST['email'];
-   $fullname=$_POST['fullName'];
-   $address=$_POST['address'];
-   $proffession=$_POST['proffession'];
-   $mobileNumber=$_POST['mobile'];
-   $birth=$_POST['birth'];
-   $about=$_POST['about'];
-   $image=$newFileName??$_POST['profile'];
-   
-   $userSql= "UPDATE `tbluserregistration` SET `fullName`='$fullname',`emailid`='$email' WHERE id = $adid";
-
-   $profileSql="UPDATE `profiles` SET `address`='$address',`mobileNumber`='$mobileNumber',`date_of_birth`='$birth',`about`='$about',`image`='$image',`proffession`='$proffession' WHERE user_id = $adid";
-  //  mysqli_query($conn, $userSql);
-  //  mysqli_query($conn, $profileSql);
-   if(mysqli_query($con, $userSql) &&   mysqli_query($con, $profileSql))
-   {
-           session_start(); 
-     $_SESSION['success'] = array('message' => "Profile update Successfull!", 'type' => "success",'icon'=>"fa-square-check");
-
-      // Redirect to some page where you want to show the success message
-      header("Location: ../../view/patient/patient-profile.php");
-           exit();
-   }
-   else
-   {
-      session_start(); 
-     $_SESSION['success'] = array('message' => "Profile update Fail!",'type' => "danger",'icon'=>"fa-triangle-exclamation");
-
-      // Redirect to some page where you want to show the success message
-      header("Location: ../../view/patient/patient-profile.php");
-           exit();
-   }
-
-   
-
-
-}
+ 
 
 if (strlen($_SESSION['user']['id']==0)) {
  header('Location:../../logout.php');
@@ -87,7 +21,7 @@ if (strlen($_SESSION['user']['id']==0)) {
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-  <title>Patient-Profile</title>
+  <title>Patient-Details</title>
   <meta content="" name="description">
   <meta content="" name="keywords">
   <link href="../../assets/img/title-logo.png" rel="icon">
@@ -129,22 +63,23 @@ if (strlen($_SESSION['user']['id']==0)) {
   <?php include_once('../../includes/header.php'); ?>
   <?php include_once('../../includes/sidebar.php'); ?>
  <!-- End Sidebar-->
-  <?php if($_SESSION['user']['id']):?>
-<?php 
-$adid=$_SESSION['user']['id'];
-$query="SELECT *
-     FROM tbluserregistration
-     JOIN profiles ON tbluserregistration.id = profiles.user_id  WHERE tbluserregistration.id = $adid";
- $ret1=mysqli_query($con,$query);
-  
-while($row1=mysqli_fetch_array($ret1)){
-
-?>
+    <?php 
+       $id=$_GET['id'];
+       
+   $patientSql = "SELECT *
+              FROM tbluserregistration
+              JOIN profiles ON tbluserregistration.id = profiles.user_id
+              WHERE emailid ='$id'";
+      $users= mysqli_query($con, $patientSql); 
+      $row = mysqli_fetch_assoc($users);
+      
+      ?>
+ 
   <main id="main" class="main">
 <?php include_once('../../includes/alert-message.php'); ?>
      <div class="d-flex justify-content-between pt-3">
     <div class="pagetitle">
-      <h1>Profile</h1>
+      <h1><?php echo $row['fullName'] ?></h1>
    
       <nav>
         <ol class="breadcrumb">
@@ -165,9 +100,9 @@ while($row1=mysqli_fetch_array($ret1)){
           <div class="card">
             <div class="card-body profile-card pt-4 d-flex flex-column align-items-center">
 
-              <img src="../../assets/profile/<?php echo $row1['image'] ?>" alt="Profile" class="rounded-circle border-2 border-info" style="width:150; height:150px">
-              <h5><?php echo $row1['fullName'] ?></h5>
-              <h6><?php echo $row1['proffession'] ?></h6>
+              <img src="../../assets/profile/<?php echo $row['image'] ?>" alt="Profile" class="rounded-circle border-2 border-info" style="width:150; height:150px">
+              <h5><?php echo $row['fullName'] ?></h5>
+             <span class="badge  <?php echo $row['is_varify'] == 1 ? 'text-bg-success' : 'text-bg-danger' ?>"><?php echo $row['is_varify']==1?'Active':'InActive' ?></span>
               <div class="social-links mt-2">
                 <a href="#" class="twitter"><i class="bi bi-twitter"></i></a>
                 <a href="#" class="facebook"><i class="bi bi-facebook"></i></a>
@@ -191,137 +126,54 @@ while($row1=mysqli_fetch_array($ret1)){
                 </li>
 
                 <li class="nav-item">
-                  <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-edit">Edit Profile</button>
+                  <!-- <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-edit">Edit Profile</button> -->
+                  <a href="../../view/admin/patient-edit.php?id=<?php echo $row['emailid']; ?>" class="nav-link btn ">Edit Profile</a>
                 </li>
 
-                <!-- <li class="nav-item">
-                  <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-settings">Settings</button>
-                </li>
-
-                <li class="nav-item">
-                  <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-change-password">Change Password</button>
-                </li> -->
-
+              
               </ul>
               <div class="tab-content pt-2">
 
                 <div class="tab-pane fade show active profile-overview" id="profile-overview">
                   <h5 class="card-title">About</h5>
-                  <p class="small fst-italic"><?php echo $row1['about'] ?></p>
+                  <p class="small fst-italic"><?php echo $row['about'] ?></p>
 
                   <h5 class="card-title">Profile Details</h5>
 
                   <div class="row">
                     <div class="col-lg-3 col-md-4 label col-6">Full Name :</div>
-                    <div class="col-lg-9 col-md-8 col-6"><?php echo $row1['fullName'] ?></div>
+                    <div class="col-lg-9 col-md-8 col-6"><?php echo $row['fullName'] ?></div>
                   </div>
                   <hr>
-                  <div class="row">
+                   <div class="row">
                     <div class="col-lg-3 col-md-4 label col-6">Date of Birth :</div>
-                    <div class="col-lg-9 col-md-8 col-6"><?php echo $row1['date_of_birth'] ?></div>
-                  </div>
-                      <hr>
-                  <div class="row">
-                    <div class="col-lg-3 col-md-4 label col-6">Proffession :</div>
-                    <div class="col-lg-9 col-md-8 col-6"><?php echo $row1['proffession'] ?></div>
-                  </div>
-                    <hr>
-                  <div class="row">
-                    <div class="col-lg-3 col-md-4 label col-6">Address :</div>
-                    <div class="col-lg-9 col-md-8 col-6"><?php echo $row1['address'] ?></div>
+                    <div class="col-lg-9 col-md-8 col-6"><?php echo $row['date_of_birth'] ?></div>
                   </div>
                   <hr>
                   <div class="row">
                     <div class="col-lg-3 col-md-4 label col-6">Mobile :</div>
-                    <div class="col-lg-9 col-md-8 col-6"><?php echo $row1['mobileNumber'] ?></div>
+                    <div class="col-lg-9 col-md-8 col-6"><?php echo $row['mobileNumber'] ?></div>
                   </div>
-                        <hr>
+                      <hr>
+                  <div class="row">
+                    <div class="col-lg-3 col-md-4 label col-6">Proffession :</div>
+                    <div class="col-lg-9 col-md-8 col-6"><?php echo $row['proffession'] ?></div>
+                  </div>
+                    <hr>
+                  <div class="row">
+                    <div class="col-lg-3 col-md-4 label col-6">Address :</div>
+                    <div class="col-lg-9 col-md-8 col-6"><?php echo $row['address'] ?></div>
+                  </div>
+                  <hr>
+                  
                   <div class="row">
                     <div class="col-lg-3 col-md-4 label col-6">Email :</div>
-                    <div class="col-lg-9 col-md-8 col-6"><?php echo $row1['emailid'] ?></div>
+                    <div class="col-lg-9 col-md-8 col-6"><?php echo $row['emailid'] ?></div>
                   </div>
 
                 </div>
 
-                <div class="tab-pane fade profile-edit pt-3" id="profile-edit">
-
-                  <!-- Profile Edit Form -->
-                  <form method="POST" enctype="multipart/form-data">
-                    <div class="row mb-3">
-                      <label for="profileImage" class="col-md-4 col-lg-3 col-form-label">Profile Image</label>
-                      <div class="col-md-8 col-lg-9">
-                        <img src="../../assets/profile/<?php echo $row1['image'] ?>" alt="Profile" style="width:100px; height:100px" id="preview-image">
-                        <div class="pt-2 mx-auto">
-                         <div class="input-group mb-3 mx-auto">
-                        <label class="input-group-text bg-primary rounded-2" for="inputGroupFile01" id="upload-label">
-                          <i class="bi bi-upload px-4 text-white rounded-2"></i>
-                           </label>
-                        <input type="file" class="form-control mx-auto" id="inputGroupFile01" style="display:none" onchange="previewImage()" name="image">
-                        <input type="hidden" name="profile" value="<?php echo $row1['image'] ?>">
-                      </div>
-                           
-                        </div>
-                      </div>
-                    </div>
-
-                    <div class="row mb-3">
-                      <label for="fullName" class="col-md-4 col-lg-3 col-form-label">Full Name</label>
-                      <div class="col-md-8 col-lg-9">
-                        <input name="fullName" type="text" class="form-control" id="fullName" value="<?php echo $row1['fullName'] ?>">
-                      </div>
-                    </div>
-                   <div class="row mb-3">
-                      <label for="Country" class="col-md-4 col-lg-3 col-form-label">Date of Birth</label>
-                      <div class="col-md-8 col-lg-9">
-                        <input name="birth" type="date" class="form-control" id="birth" value="<?php echo $row1['date_of_birth'] ?>" required>
-                      </div>
-                    </div>
-                    <div class="row mb-3">
-                      <label for="about" class="col-md-4 col-lg-3 col-form-label">About</label>
-                      <div class="col-md-8 col-lg-9">
-                        <textarea name="about" class="form-control" id="about" style="height: 100px"><?php echo $row1['about'] ?></textarea>
-                      </div>
-                    </div>
-
-                    <div class="row mb-3">
-                      <label for="company" class="col-md-4 col-lg-3 col-form-label">Proffession</label>
-                      <div class="col-md-8 col-lg-9">
-                        <input name="proffession" type="text" class="form-control" id="proffession" value="<?php echo $row1['proffession'] ?>">
-                      </div>
-                    </div>
-
-                  
-                    <div class="row mb-3">
-                      <label for="Address" class="col-md-4 col-lg-3 col-form-label">Address</label>
-                      <div class="col-md-8 col-lg-9">
-                        <input name="address" type="text" class="form-control" id="Address" value="<?php echo $row1['address'] ?>">
-                      </div>
-                    </div>
-
-                    <div class="row mb-3">
-                      <label for="Phone" class="col-md-4 col-lg-3 col-form-label">Mobile</label>
-                      <div class="col-md-8 col-lg-9">
-                        <input name="mobile" type="text" class="form-control" id="Phone" value="<?php echo $row1['mobileNumber'] ?>" required>
-                      </div>
-                    </div>
-
-                <div class="row mb-3">
-  <label for="Email" class="col-md-4 col-lg-3 col-form-label">Email</label>
-  <div class="col-md-8 col-lg-9">
-    <input name="email" type="email" class="form-control" id="Email" value="<?php echo $row1['emailid'] ?>">
-  </div>
-</div>
-
-                    
- 
-  
-
-                    <div class="text-center">
-                      <button type="submit" class="btn btn-primary" name="update">Save Changes</button>
-                    </div>
-                  </form><!-- End Profile Edit Form -->
-
-                </div>
+     
 
                 <div class="tab-pane fade pt-3" id="profile-settings">
 
@@ -433,8 +285,8 @@ while($row1=mysqli_fetch_array($ret1)){
       Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
     </div>
   </footer><!-- End Footer -->
-<?php } ?>
-  <?php endif;?>
+ 
+ 
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
 <script>
@@ -495,3 +347,4 @@ while($row1=mysqli_fetch_array($ret1)){
 
 </html>
 <?php } ?>
+ 

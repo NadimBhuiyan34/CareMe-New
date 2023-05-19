@@ -1,7 +1,13 @@
-<?php
+ <?php
 session_start();
 
 include_once('../../includes/config.php');
+
+// $patientSql="SELECT * FROM `tbluserregistration` WHERE role =='patient'";
+$doctorSql="SELECT *
+     FROM tbluserregistration
+     JOIN doctor_profiles ON tbluserregistration.id = doctor_profiles.user_id WHERE role = 'doctor' ORDER BY regDate DESC";
+$users= mysqli_query($con, $doctorSql);
 
  
 
@@ -40,8 +46,8 @@ if (strlen($_SESSION['user']['id']) == 0) {
   <link href="../../assets/vendor/quill/quill.snow.css" rel="stylesheet">
   <link href="../../assets/vendor/quill/quill.bubble.css" rel="stylesheet">
   <link href="../../assets/vendor/remixicon/remixicon.css" rel="stylesheet">
-  <!-- <link href="../../assets/vendor/simple-datatables/datatables.min.css" rel="stylesheet"> -->
-    <link rel="stylesheet" href="../../assets/vendor/simple-datatables/style.css">
+  <link href="../../assets/vendor/simple-datatables/style.css" rel="stylesheet">
+    <!-- <link rel="stylesheet" href="../../assets/css/datatables.min.css"> -->
  
     
 
@@ -67,7 +73,7 @@ if (strlen($_SESSION['user']['id']) == 0) {
 <!-- End Sidebar-->
 
   <main id="main" class="main">
-   <div class="d-flex justify-content-between">
+   <div class="d-flex justify-content-between pt-3">
     <div class="pagetitle">
       <h1>Doctor</h1>
    
@@ -84,22 +90,11 @@ if (strlen($_SESSION['user']['id']) == 0) {
     </div>
   </div>
     <!-- End Page Title -->
-
+ <?php include_once('../../includes/alert-message.php'); ?>
    <div class="col-12" id="myTable">
               <div class="card recent-sales overflow-auto" >
 
-                <!-- <div class="filter">
-                  <a class="icon btn btn-info btn-sm" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i>Action</a>
-                  <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                    <li class="dropdown-header text-start">
-                      <h6>Filter</h6>
-                    </li>
-
-                    <li><a class="dropdown-item" href="#">Today</a></li>
-                    <li><a class="dropdown-item" href="#">This Month</a></li>
-                    <li><a class="dropdown-item" href="#">This Year</a></li>
-                  </ul>
-                </div> -->
+               
                 <div class="mt-2 ms-2">
                    <a href="../../view/admin/doctor-registration.php" class="btn btn-primary btn-sm shadow">Doctor Registration</a>
                 </div>
@@ -111,49 +106,39 @@ if (strlen($_SESSION['user']['id']) == 0) {
                   <table class="table datatable">
                     <thead>
                       <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">Customer</th>
-                        <th scope="col">Product</th>
-                        <th scope="col">Price</th>
+                       
+                        <th scope="col">Name</th>
+                        <th scope="col">Email</th>
+                        <th scope="col">Mobile</th>
+                        <th scope="col">Academic Title</th>
+                        <th scope="col">Specialtist</th>
+                        <th scope="col">Image</th>
                         <th scope="col">Status</th>
+                        <th scope="col">Action</th>
                       </tr>
                     </thead>
                     <tbody>
+                       <?php while ($row = $users->fetch_assoc()) : ?>
                       <tr>
-                        <th scope="row"><a href="#">#2457</a></th>
-                        <td>Brandon Jacob</td>
-                        <td><a href="#" class="text-primary">At praesentium minu</a></td>
-                        <td>$64</td>
-                        <td><span class="badge bg-success">Approved</span></td>
+                       
+                        <td><?php echo $row['fullName'] ?></td>
+                        <td><?php echo $row['emailid'] ?></td>
+                        <td><?php echo $row['mobile'] ?></td>
+                        <td><?php echo $row['academic_title'] ?></td>
+                        <td><?php echo $row['specialties'] ?></td>
+                        <td><img src="../../assets/profile/<?php echo $row['image'] ?>" alt="" style="width:80px;height:80px"></td>
+                        <td> <span class="badge  <?php echo $row['is_varify'] == 1 ? 'text-bg-success' : 'text-bg-danger' ?>"><?php echo $row['is_varify']==1?'Active':'InActive' ?></span></td>
+                        <td class="d-flex">
+                             <a href="../../view/admin/doctor-details.php?id=<?php echo $row['emailid']; ?>" class="btn btn-sm btn-success">View</a>
+                         <a href="../../view/admin/doctor-edit.php?id=<?php echo $row['emailid']; ?>" class="btn btn-sm btn-primary">Edit</a>
+                                      
+                        
+                           <a href="" class="btn btn-sm btn-danger">Delete</a>
+                        </td>
                       </tr>
-                      <tr>
-                        <th scope="row"><a href="#">#2147</a></th>
-                        <td>Bridie Kessler</td>
-                        <td><a href="#" class="text-primary">Blanditiis dolor omnis similique</a></td>
-                        <td>$47</td>
-                        <td><span class="badge bg-warning">Pending</span></td>
-                      </tr>
-                      <tr>
-                        <th scope="row"><a href="#">#2049</a></th>
-                        <td>Ashleigh Langosh</td>
-                        <td><a href="#" class="text-primary">At recusandae consectetur</a></td>
-                        <td>$147</td>
-                        <td><span class="badge bg-success">Approved</span></td>
-                      </tr>
-                      <tr>
-                        <th scope="row"><a href="#">#2644</a></th>
-                        <td>Angus Grady</td>
-                        <td><a href="#" class="text-primar">Ut voluptatem id earum et</a></td>
-                        <td>$67</td>
-                        <td><span class="badge bg-danger">Rejected</span></td>
-                      </tr>
-                      <tr>
-                        <th scope="row"><a href="#">#2644</a></th>
-                        <td>Raheem Lehner</td>
-                        <td><a href="#" class="text-primary">Sunt similique distinctio</a></td>
-                        <td>$165</td>
-                        <td><span class="badge bg-success">Approved</span></td>
-                      </tr>
+                       <?php endwhile; ?>
+                       
+                      
                     </tbody>
                   </table>
              
@@ -165,22 +150,29 @@ if (strlen($_SESSION['user']['id']) == 0) {
 
               </div>
             </div>
+            <!-- mobileDiv -->
                  <div class="row g-2" id="mobileDiv">
                       <div>
                         <a href="../../view/admin/doctor-registration.php" class="btn btn-sm btn-primary mb-2 shadow">Doctor Registration</a>
                       </div>
-                           <div class="col-md-3 col-12 col-xl-4 col-sm-6">
+               <?php 
+                  $doctorSql="SELECT *
+                              FROM tbluserregistration
+                             JOIN doctor_profiles ON tbluserregistration.id = doctor_profiles.user_id WHERE role = 'doctor' ORDER BY regDate DESC";
+                              $users= mysqli_query($con, $doctorSql);
+               while ($row = $users->fetch_assoc()) : ?>
+                  <div class="col-md-3 col-6 col-xl-4 col-sm-6">
 
-            <div class="card p-2 py-3 text-center border-left-info doctor">
+                   <div class="card p-2  text-center border-left-info doctor">
 
                 <div class="img mb-2">
 
-                    <img src="https://i.imgur.com/LohyFIN.jpg" width="70" class="rounded-circle">
+                    <img src="../../assets/profile/<?php echo $row['image'] ?>" width="70" class="rounded-circle" height="70px">
                     
                 </div>
 
-                <h5 class="mb-0">Patey Cruiser</h5>
-                <small>Neurosurgeon</small>
+                <h6 class="mb-0"><?php echo $row['fullName'] ?></h6>
+                <small><?php echo $row['specialties'] ?></small>
 
                 <div class="ratings mt-2">
 
@@ -193,38 +185,22 @@ if (strlen($_SESSION['user']['id']) == 0) {
 
                 <div class="mt-4 apointment d-flex justify-content-center gap-2">
 
-                    <button class="btn btn-success btn-sm" data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample"><i class="fa-solid fa-info text-white mr-1"></i></i>More</button>
-                    <button class="btn btn-success btn-sm" data-bs-toggle="collapse" href="#collapseExample1" role="button" aria-expanded="false" aria-controls="collapseExample1"><i class="fa-solid fa-share text-white mr-1"></i>Update</button>
+                   <a href="../../view/admin/doctor-details.php?id=<?php echo $row['emailid']; ?>" class="btn btn-sm btn-primary">More</a>
+ <a href="../../view/admin/doctor-edit.php?id=<?php echo $row['emailid']; ?>" class="btn btn-sm btn-primary">Edit</a>
     
                 </div>
                 <!-- More  -->
-                <div class="collapse mt-2 shadow" id="collapseExample">
-                    <div class="card card-body">
-                      <p>Education Qualification: Dhaka Medical Collage</p><br>
-                      <p>hdsgbcndbc: ahsgcghgsdb</p>
-                    </div>
-                </div>
+                 
                 <!-- Share -->
-                <div class="collapse mt-2 shadow" id="collapseExample1">
-                    <div class="card card-body">
-
-                    <div class="form-floating ">
-
-                    <textarea class="form-control" placeholder="Leave a comment here" id="floatingTextarea2" style="height: 100px"></textarea>
-                    <label for="floatingTextarea2">Share your problem</label>
-                    <br>
-                            <div class="m-auto">
-                            <button class="btn btn-success" type="submit">Submit</button>
-                            </div>
-                    </div>
-                </div>
-            </div>
+              
             
       
 </div>
 </div>
-
+  <?php endwhile; ?>
                   </div>
+   
+
   </main><!-- End #main -->
 
   <!-- ======= Footer ======= -->
@@ -242,7 +218,12 @@ if (strlen($_SESSION['user']['id']) == 0) {
   </footer><!-- End Footer -->
 
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
-    <script src="../../assets/js/jquery-3.6.0.min.js"></script>
+  
+  
+
+
+
+     <script src="../../assets/js/jquery-3.6.0.min.js"></script>
  <script>
 // JavaScript/jQuery code to check device size and toggle table visibility
 
@@ -266,10 +247,6 @@ $(window).on('load resize', function() {
 </script>
 
 
-
- 
-
-
   <!-- Vendor JS Files -->
   <script src="../../assets/vendor/apexcharts/apexcharts.min.js"></script>
   <script src="../../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
@@ -279,7 +256,7 @@ $(window).on('load resize', function() {
   <script src="../../assets/vendor/simple-datatables/simple-datatables.js"></script>
   <script src="../../assets/vendor/tinymce/tinymce.min.js"></script>
   <script src="../../assets/vendor/php-email-form/validate.js"></script>
-
+  <script src="../../assets/js/jquery-3.6.0.min.js"></script>
  
 
   <!-- Template Main JS File -->

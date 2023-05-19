@@ -57,8 +57,8 @@ if (strlen($_SESSION['user']['id']==0)) {
 
 <!-- End Sidebar-->
 
-  <main id="main" class="main">
-   <div class="d-flex justify-content-between">
+  <main id="main" class="">
+   <div class="d-flex justify-content-between ">
     <div class="pagetitle">
       <h1>Prescription</h1>
    

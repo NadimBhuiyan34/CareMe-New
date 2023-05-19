@@ -58,7 +58,7 @@ if (strlen($_SESSION['user']['id']==0)) {
 <!-- End Sidebar-->
 
   <main id="main" class="main">
-   <div class="d-flex justify-content-between">
+   <div class="d-flex justify-content-between pt-3">
     <div class="pagetitle">
       <h1>Take Treatment</h1>
    
@@ -156,6 +156,7 @@ if (strlen($_SESSION['user']['id']==0)) {
 <div class=" mt-1 mb-5" id="doctordiv" style="display:none">
 
 <div class="row">
+
 <div class="input-group mb-3 col-10 col-xl-5 mx-auto mb-2" >
   <input type="text" class="form-control shadow" placeholder="Search here" style="border-radius:20px;" id="search">
  
@@ -164,33 +165,31 @@ if (strlen($_SESSION['user']['id']==0)) {
 </div>
     
     <div class="row g-2">
-
-        <div class="col-md-3 col-12 col-xl-4 col-sm-6">
+            <?php 
+                  $doctorSql="SELECT *
+                              FROM tbluserregistration
+                             JOIN doctor_profiles ON tbluserregistration.id = doctor_profiles.user_id WHERE role = 'doctor' ORDER BY regDate DESC";
+                              $users= mysqli_query($con, $doctorSql);
+               while ($row = $users->fetch_assoc()) : ?>
+        <div class="col-md-3 col-12  col-xl-4 col-sm-6">
 
             <div class="card p-2 py-3 text-center border-left-info doctor">
 
                 <div class="img mb-2">
 
-                    <img src="https://i.imgur.com/LohyFIN.jpg" width="70" class="rounded-circle">
+                 <img src="../../assets/profile/<?php echo $row['image'] ?>" width="70" class="rounded-circle" height="70px">
                     
                 </div>
 
-                <h5 class="mb-0">Patey Cruiser</h5>
-                <small>Neurosurgeon</small>
+               <h6 class="mb-0"><?php echo $row['fullName'] ?></h6>
+                <small><?php echo $row['specialties'] ?></small>
 
-                <div class="ratings mt-2">
-
-                    <i class="fa fa-star"></i>
-                    <i class="fa fa-star"></i>
-                    <i class="fa fa-star"></i>
-                    <i class="fa fa-star"></i>
-                    
-                </div>
+               
 
                 <div class="mt-4 apointment d-flex justify-content-center gap-2">
 
-                    <button class="btn btn-success btn-sm" data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample"><i class="fa-solid fa-info text-white mr-1"></i></i>More</button>
-                    <button class="btn btn-success btn-sm" data-bs-toggle="collapse" href="#collapseExample1" role="button" aria-expanded="false" aria-controls="collapseExample1"><i class="fa-solid fa-share text-white mr-1"></i>Share Problem</button>
+                    <button class="btn btn-success btn-sm" data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">More</button>
+                    <button class="btn btn-success btn-sm" data-bs-toggle="collapse" href="#collapseExample1" role="button" aria-expanded="false" aria-controls="collapseExample1">Treatment</button>
     
                 </div>
                 <!-- More  -->
@@ -220,64 +219,7 @@ if (strlen($_SESSION['user']['id']==0)) {
 </div>
 </div>
 
-
-
-        <div class="col-md-3 col-12 col-xl-4 col-sm-6">
-
-            <div class="card p-2 py-3 text-center border-left-info doctor">
-
-                <div class="img mb-2">
-
-                    <img src="https://i.imgur.com/LohyFIN.jpg" width="70" class="rounded-circle">
-                    
-                </div>
-
-                <h5 class="mb-0">Nadim Bhuiyan</h5>
-                <small>Neurosurgeon</small>
-
-                <div class="ratings mt-2">
-
-                    <i class="fa fa-star"></i>
-                    <i class="fa fa-star"></i>
-                    <i class="fa fa-star"></i>
-                    <i class="fa fa-star"></i>
-                    
-                </div>
-
-                <div class="mt-4 apointment d-flex justify-content-center gap-2">
-
-                    <button class="btn btn-success btn-sm" data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample"><i class="fa-solid fa-info text-white mr-1"></i></i>More</button>
-                    <button class="btn btn-success btn-sm" data-bs-toggle="collapse" href="#collapseExample1" role="button" aria-expanded="false" aria-controls="collapseExample1"><i class="fa-solid fa-share text-white mr-1"></i>Share Problem</button>
-    
-                </div>
-                <!-- More  -->
-                <div class="collapse mt-2 shadow" id="collapseExample">
-                    <div class="card card-body">
-                      <p>Education Qualification: Dhaka Medical Collage</p><br>
-                      <p>hdsgbcndbc: ahsgcghgsdb</p>
-                    </div>
-                </div>
-                <!-- Share -->
-                <div class="collapse mt-2 shadow" id="collapseExample1">
-                    <div class="card card-body">
-                    <div class="form-floating">
-
-                    <textarea class="form-control" placeholder="Leave a comment here" id="floatingTextarea2" style="height: 100px"></textarea>
-                    <label for="floatingTextarea2">Share your problem</label>
-                    <br>
-                  <div class="m-auto">
-                  <button class="btn btn-success" type="submit">Submit</button>
-                  </div>
-                    </div>
-                </div>
-            </div>
-            
-        </div>
-   
-    </div>
-       
-
-   </div>
+  <?php endwhile; ?>
  
 
 

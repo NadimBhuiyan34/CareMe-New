@@ -144,7 +144,7 @@ if (strlen($_SESSION['user']['id']==0)) {
  
   <main id="main" class="main">
 
-     <div class="d-flex justify-content-between">
+     <div class="d-flex justify-content-between pt-3">
     <div class="pagetitle">
       <h1>Change Password</h1>
    
