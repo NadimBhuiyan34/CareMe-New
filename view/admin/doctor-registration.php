@@ -5,7 +5,11 @@ include_once('../../includes/config.php');
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
-
+if($_SESSION['user']['role'] !='admin')
+{
+         header('Location:../../pages-error.php');
+         exit();
+}
  if(isset($_POST['submit']))
  {
 

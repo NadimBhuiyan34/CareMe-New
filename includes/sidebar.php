@@ -21,7 +21,7 @@
                {
                 ?>
                 <li class="nav-item">
-        <a class="nav-link " href="index.html">
+        <a class="nav-link " href="../../view/doctor/doctor-dashboard.php">
           <i class="bi bi-grid"></i>
           <span>Dashboard</span>
         </a>
@@ -62,6 +62,12 @@
           <span>Prescription</span>
         </a>
       </li><!-- End F.A.Q Page Nav -->
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="../../view/patient/requested-treatment.php">
+          <i class="bi bi-question-circle"></i>
+          <span>Requested Treatment</span>
+        </a>
+      </li><!-- End F.A.Q Page Nav -->
     <?php } 
          if($_SESSION['user']['role']=='admin')
          {
@@ -80,7 +86,19 @@
           <span>Patient</span>
         </a>
       </li>
-      <?php } ?>
+      <?php }
+      
+      if($_SESSION['user']['role']=='doctor')
+      {
+      ?>
+              <li class="nav-item">
+        <a class="nav-link collapsed" href="../../view/doctor/requested-treatment.php">
+          <i class="bi bi-question-circle"></i>
+          <span>Requested Treatment</span>
+        </a>
+      </li>
+    <?php } ?>
+
     </ul>
  
   </aside>

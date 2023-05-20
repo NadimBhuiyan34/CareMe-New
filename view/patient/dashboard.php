@@ -2,7 +2,11 @@
 session_start();
 
 include_once('../../includes/config.php');
-
+ if($_SESSION['user']['role'] !='patient')
+{
+         header('Location:../../pages-error.php');
+         exit();
+}
  
 $device_id = $_SESSION['user']['device'];
 

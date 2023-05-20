@@ -2,7 +2,7 @@
 session_start();
  
 include_once('../../includes/config.php');
- if($_SESSION['user']['role'] !='patient')
+ if($_SESSION['user']['role'] !='doctor')
 {
          header('Location:../../pages-error.php');
          exit();
@@ -20,7 +20,7 @@ if (strlen($_SESSION['user']['id']==0)) {
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-  <title>Patient-Prescription</title>
+  <title>Doctor-RequestedTreatment</title>
   <meta content="" name="description">
   <meta content="" name="keywords">
 
@@ -63,9 +63,9 @@ if (strlen($_SESSION['user']['id']==0)) {
 <!-- End Sidebar-->
 
   <main id="main" class="">
-   <div class="d-flex justify-content-between ">
+   <div class="d-flex justify-content-between pt-3">
     <div class="pagetitle">
-      <h1>Prescription</h1>
+      <h1>Requested Treatment</h1>
    
       <nav>
         <ol class="breadcrumb">
@@ -83,102 +83,49 @@ if (strlen($_SESSION['user']['id']==0)) {
 
     <section class="section dashboard">
       
-<div class="row g-2 mx-auto mx-md-0">
+<div class="row g-2">
+<?php 
+  $doctor_id= $_SESSION['user']['id'];
+ $doctorSql="SELECT * FROM prescriptions
+                     WHERE doctor_id = $doctor_id ORDER BY created_at DESC";
+    $request= mysqli_query($con, $doctorSql);
 
+  while ($row = $request->fetch_assoc()) : 
+       $user_id=$row['patient_id'];
+    $query="SELECT *
+     FROM tbluserregistration
+     JOIN profiles ON tbluserregistration.id = profiles.user_id  WHERE tbluserregistration.id = $user_id";
+      $ret1=mysqli_query($con,$query);
+      $user = $ret1->fetch_assoc()
+  ?>
+   
+ 
 
-<div class="col-md-3 col-6 col-xl-3 col-sm-6 mx-auto">
-
-    <div class="card p-2 py-3 text-center border-left-info mx-auto">
-
-        <div class="img mb-2">
-
-        <i class="fa-solid fa-file-prescription fa-bounce fa-2xl" style="color: #f91a5d;"></i>
-            
-        </div>
-
-            <h6 style="color:#041f8a">PS-1236</h6>
-            <small>Nadim Bhuiyan</small>
-            <p>12 June 2023</p>
-
-        
-        <div class="mt-1 apointment d-flex justify-content-center gap-2">
-
-            <!-- <a href="" class="btn btn-info btn-sm "><i class="fa-regular fa-eye"></i></a> -->
-            <a href="prescription-pdf.php" class="btn btn-success btn-sm "><i class="fa-solid fa-download"></i></a>
-           
-        </div>
-    </div>
-</div>
 <div class="col-md-3 col-6 col-xl-3 col-sm-6">
 
     <div class="card p-2 py-3 text-center border-left-info">
 
         <div class="img mb-2">
 
-        <i class="fa-solid fa-file-prescription fa-bounce fa-2xl" style="color: #f91a5d;"></i>
+          <img src="../../assets/profile/<?php echo $user['image'] ?>" alt="" style="width:70px;height:70px">
             
         </div>
 
-            <h6 style="color:#041f8a">PS-1236</h6>
-            <small>Nadim Bhuiyan</small>
-            <p>12 June 2023</p>
+            <h6 style="color:#041f8a"><?php echo $row['created_at'] ?></h6>
+            <small><?php echo $user['fullName'] ?></small>
+            <p><?php echo $user['mobileNumber'] ?></p>
 
         
         <div class="mt-1 apointment d-flex justify-content-center gap-2">
 
             <!-- <a href="" class="btn btn-info btn-sm "><i class="fa-regular fa-eye"></i></a> -->
-            <a href="prescription-pdf.php" class="btn btn-success btn-sm "><i class="fa-solid fa-download"></i></a>
+            <a href="" class="btn btn-success btn-sm ">Details</a>
            
         </div>
     </div>
 </div>
-<div class="col-md-3 col-6 col-xl-3 col-sm-6 mx-auto">
-
-    <div class="card p-2 py-3 text-center border-left-info mx-auto">
-
-        <div class="img mb-2">
-
-        <i class="fa-solid fa-file-prescription fa-bounce fa-2xl" style="color: #f91a5d;"></i>
-            
-        </div>
-
-            <h6 style="color:#041f8a">PS-12366</h6>
-            <small>Rahim Bhuiyan</small>
-            <p>13 June 2023</p>
-
-        
-        <div class="mt-1 apointment d-flex justify-content-center gap-2">
-
-            <!-- <a href="" class="btn btn-info btn-sm "><i class="fa-regular fa-eye"></i></a> -->
-            <a href="prescription-pdf.php" class="btn btn-success btn-sm "><i class="fa-solid fa-download"></i></a>
-           
-        </div>
-    </div>
-</div>
-<div class="col-md-3 col-6 col-xl-3 col-sm-6">
-
-    <div class="card p-2 py-3 text-center border-left-info">
-
-        <div class="img mb-2">
-
-        <i class="fa-solid fa-file-prescription fa-bounce fa-2xl" style="color: #f91a5d;"></i>
-            
-        </div>
-
-            <h6 style="color:#041f8a">PS-1236</h6>
-            <small>Nadim Bhuiyan</small>
-            <p>12 June 2023</p>
-
-        
-        <div class="mt-1 apointment d-flex justify-content-center gap-2">
-
-            <!-- <a href="" class="btn btn-info btn-sm "><i class="fa-regular fa-eye"></i></a> -->
-            <a href="prescription-pdf.php" class="btn btn-success btn-sm "><i class="fa-solid fa-download"></i></a>
-           
-        </div>
-    </div>
-</div>
-</div>
+   <?php endwhile; ?>
+ 
 
 
     </section>

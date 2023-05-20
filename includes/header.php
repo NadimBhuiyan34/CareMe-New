@@ -34,12 +34,13 @@ while($row1=mysqli_fetch_array($ret1)){
     </div><!-- End Logo -->
 
     <div class="search-bar">
-      <!-- <form class="search-form d-flex align-items-center" method="POST" action="#"> -->
+      <form class="search-form d-flex align-items-center" method="POST" action="#">
         <input type="text" name="query" placeholder="Search" title="Enter search keyword" id="search">
-        <!-- <button type="submit" title="Search"><i class="bi bi-search"></i></button> -->
-      <!-- </form> -->
+        
+      </form>
+      
     </div><!-- End Search Bar -->
-
+       <div id="suggestion-container"></div>
     <nav class="header-nav ms-auto">
       <ul class="d-flex align-items-center">
 

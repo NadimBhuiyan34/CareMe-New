@@ -1,7 +1,11 @@
 <?php
 session_start();
 require '../../vendor/autoload.php';
-
+ if($_SESSION['user']['role'] !='patient')
+{
+         header('Location:../../pages-error.php');
+         exit();
+}
  
 include_once('../../includes/config.php');
 if (strlen($_SESSION['user']['id']==0)) {

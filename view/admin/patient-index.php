@@ -2,7 +2,11 @@
 session_start();
 
 include_once('../../includes/config.php');
-
+ if($_SESSION['user']['role'] !='admin')
+{
+         header('Location:../../pages-error.php');
+         exit();
+}
 // $patientSql="SELECT * FROM `tbluserregistration` WHERE role =='patient'";
 $patientSql="SELECT *
      FROM tbluserregistration

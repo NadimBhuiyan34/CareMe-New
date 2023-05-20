@@ -5,7 +5,11 @@ include_once('../../includes/config.php');
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
-
+if($_SESSION['user']['role'] !='admin')
+{
+         header('Location:../../pages-error.php');
+         exit();
+}
  if(isset($_POST['submit']))
  {
 
@@ -241,7 +245,7 @@ if (strlen($_SESSION['user']['id']) == 0) {
                            <img src="https://cdn.pixabay.com/photo/2016/01/03/00/43/upload-1118929_1280.png" alt="" style="width:70px;height:70px">
                            </label>
                         <input type="file" class="form-control mx-auto" id="inputGroupFile01" style="display:none" onchange="previewImage()" name="image">
-                           
+  
                   
                 </div>
  

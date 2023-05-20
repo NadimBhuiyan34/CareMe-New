@@ -3,7 +3,11 @@ session_start();
 
 include_once('../../includes/config.php');
 
- 
+if($_SESSION['user']['role'] !='admin')
+{
+         header('Location:../../pages-error.php');
+         exit();
+}
 
 if (strlen($_SESSION['user']['id']) == 0) {
        header('Location:../../logout.php');

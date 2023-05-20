@@ -5,12 +5,12 @@ session_start();
 require '../../vendor/autoload.php';
  
 include_once('../../includes/config.php');
-
- if($_SESSION['user']['role'] !='admin')
+ if($_SESSION['user']['role'] !='patient')
 {
          header('Location:../../pages-error.php');
          exit();
 }
+ 
 
 if (strlen($_SESSION['user']['id']==0)) {
  header('Location:../../logout.php');
@@ -25,7 +25,7 @@ if (strlen($_SESSION['user']['id']==0)) {
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-  <title>Patient-Details</title>
+  <title>Doctor-Details</title>
   <meta content="" name="description">
   <meta content="" name="keywords">
   <link href="../../assets/img/title-logo.png" rel="icon">
@@ -70,11 +70,11 @@ if (strlen($_SESSION['user']['id']==0)) {
     <?php 
        $id=$_GET['id'];
        
-   $patientSql = "SELECT *
+   $doctorSql = "SELECT *
               FROM tbluserregistration
-              JOIN profiles ON tbluserregistration.id = profiles.user_id
+              JOIN doctor_profiles ON tbluserregistration.id = doctor_profiles.user_id
               WHERE emailid ='$id'";
-      $users= mysqli_query($con, $patientSql); 
+      $users= mysqli_query($con, $doctorSql); 
       $row = mysqli_fetch_assoc($users);
       
       ?>
@@ -128,11 +128,11 @@ if (strlen($_SESSION['user']['id']==0)) {
                 <li class="nav-item">
                   <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#profile-overview">Overview</button>
                 </li>
-
+<!-- 
                 <li class="nav-item">
-                  <!-- <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-edit">Edit Profile</button> -->
-                  <a href="../../view/admin/patient-edit.php?id=<?php echo $row['emailid']; ?>" class="nav-link btn ">Edit Profile</a>
-                </li>
+                  <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-edit">Edit Profile</button>
+                  <a href="../../view/admin/doctor-edit.php?id=" class="nav-link btn ">Edit Profile</a>
+                </li> -->
 
               
               </ul>
@@ -150,26 +150,30 @@ if (strlen($_SESSION['user']['id']==0)) {
                   </div>
                   <hr>
                    <div class="row">
-                    <div class="col-lg-3 col-md-4 label col-6">Date of Birth :</div>
-                    <div class="col-lg-9 col-md-8 col-6"><?php echo $row['date_of_birth'] ?></div>
+                    <div class="col-lg-3 col-md-4 label col-6">Medical Collage :</div>
+                    <div class="col-lg-9 col-md-8 col-6"><?php echo $row['collage'] ?></div>
+                  </div>
+                  <hr>
+                  <div class="row">
+                    <div class="col-lg-3 col-md-4 label col-6">Academic Title :</div>
+                    <div class="col-lg-9 col-md-8 col-6"><?php echo $row['academic_title'] ?></div>
+                  </div>
+                      <hr>
+                  <div class="row">
+                    <div class="col-lg-3 col-md-4 label col-6">Specialist :</div>
+                    <div class="col-lg-9 col-md-8 col-6"><?php echo $row['specialties'] ?></div>
+                  </div>
+                    <hr>
+                  <div class="row">
+                    <div class="col-lg-3 col-md-4 label col-6">Degree :</div>
+                    <div class="col-lg-9 col-md-8 col-6"><?php echo $row['degree'] ?></div>
                   </div>
                   <hr>
                   <div class="row">
                     <div class="col-lg-3 col-md-4 label col-6">Mobile :</div>
-                    <div class="col-lg-9 col-md-8 col-6"><?php echo $row['mobileNumber'] ?></div>
+                    <div class="col-lg-9 col-md-8 col-6"><?php echo $row['mobile'] ?></div>
                   </div>
-                      <hr>
-                  <div class="row">
-                    <div class="col-lg-3 col-md-4 label col-6">Proffession :</div>
-                    <div class="col-lg-9 col-md-8 col-6"><?php echo $row['proffession'] ?></div>
-                  </div>
-                    <hr>
-                  <div class="row">
-                    <div class="col-lg-3 col-md-4 label col-6">Address :</div>
-                    <div class="col-lg-9 col-md-8 col-6"><?php echo $row['address'] ?></div>
-                  </div>
-                  <hr>
-                  
+                        <hr>
                   <div class="row">
                     <div class="col-lg-3 col-md-4 label col-6">Email :</div>
                     <div class="col-lg-9 col-md-8 col-6"><?php echo $row['emailid'] ?></div>
@@ -178,82 +182,7 @@ if (strlen($_SESSION['user']['id']==0)) {
                 </div>
 
      
-
-                <div class="tab-pane fade pt-3" id="profile-settings">
-
-                  <!-- Settings Form -->
-                  <form>
-
-                    <div class="row mb-3">
-                      <label for="fullName" class="col-md-4 col-lg-3 col-form-label">Email Notifications</label>
-                      <div class="col-md-8 col-lg-9">
-                        <div class="form-check">
-                          <input class="form-check-input" type="checkbox" id="changesMade" checked>
-                          <label class="form-check-label" for="changesMade">
-                            Changes made to your account
-                          </label>
-                        </div>
-                        <div class="form-check">
-                          <input class="form-check-input" type="checkbox" id="newProducts" checked>
-                          <label class="form-check-label" for="newProducts">
-                            Information on new products and services
-                          </label>
-                        </div>
-                        <div class="form-check">
-                          <input class="form-check-input" type="checkbox" id="proOffers">
-                          <label class="form-check-label" for="proOffers">
-                            Marketing and promo offers
-                          </label>
-                        </div>
-                        <div class="form-check">
-                          <input class="form-check-input" type="checkbox" id="securityNotify" checked disabled>
-                          <label class="form-check-label" for="securityNotify">
-                            Security alerts
-                          </label>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div class="text-center">
-                      <button type="submit" class="btn btn-primary">Save Changes</button>
-                    </div>
-                  </form><!-- End settings Form -->
-
-                </div>
-
-                <div class="tab-pane fade pt-3" id="profile-change-password">
-                  <!-- Change Password Form -->
-                  <form>
-
-                    <div class="row mb-3">
-                      <label for="currentPassword" class="col-md-4 col-lg-3 col-form-label">Current Password</label>
-                      <div class="col-md-8 col-lg-9">
-                        <input name="password" type="password" class="form-control" id="currentPassword">
-                      </div>
-                    </div>
-
-                    <div class="row mb-3">
-                      <label for="newPassword" class="col-md-4 col-lg-3 col-form-label">New Password</label>
-                      <div class="col-md-8 col-lg-9">
-                        <input name="newpassword" type="password" class="form-control" id="newPassword">
-                      </div>
-                    </div>
-
-                    <div class="row mb-3">
-                      <label for="renewPassword" class="col-md-4 col-lg-3 col-form-label">Re-enter New Password</label>
-                      <div class="col-md-8 col-lg-9">
-                        <input name="renewpassword" type="password" class="form-control" id="renewPassword">
-                      </div>
-                    </div>
-
-                    <div class="text-center">
-                      <button type="submit" class="btn btn-primary">Change Password</button>
-                    </div>
-                  </form><!-- End Change Password Form -->
-
-                </div>
-
-              </div><!-- End Bordered Tabs -->
+ 
 
             </div>
           </div>
@@ -263,18 +192,7 @@ if (strlen($_SESSION['user']['id']==0)) {
     </section>
 
   </main><!-- End #main -->
-<div id="myModal" class="modal fade" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-body">
-        <p id="messageText">Email has been modified. Click OK to save changes.</p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-primary" id="okButton" data-bs-dismiss="modal">OK</button>
-      </div>
-    </div>
-  </div>
-</div>
+ 
 
   <!-- ======= Footer ======= -->
   <footer id="footer" class="footer">
@@ -293,46 +211,11 @@ if (strlen($_SESSION['user']['id']==0)) {
  
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
-<script>
-  const emailInput = document.getElementById('Email');
-  const messageText = document.getElementById('messageText');
-  const okButton = document.getElementById('okButton');
-  let originalEmailValue = emailInput.value;
-
-  emailInput.addEventListener('input', function() {
-    if (emailInput.value !== originalEmailValue) {
-      messageText.textContent = 'Email has been modified. Click OK to save changes.';
-      $('#myModal').modal('show');
-    }
-  });
-
-  okButton.addEventListener('click', function() {
-    originalEmailValue = emailInput.value;
-    $('#myModal').modal('hide');
-  });
-</script>
-
-
-
-   <script>
-   function previewImage() {
-  var preview = document.getElementById('preview-image');
-  var fileInput = document.getElementById('inputGroupFile01');
-  var file = fileInput.files[0];
-  var reader = new FileReader();
-  reader.onloadend = function () {
-    preview.src = reader.result;
-  }
-  if (file) {
-    reader.readAsDataURL(file);
-  } else {
-    preview.src = "{{ asset('storage/profiles').'/'.$user->profile->image }}";
-  }
-}
  
-    
-    
-</script>  
+
+
+
+ 
   <!-- Vendor JS Files -->
      <script src="../../assets/vendor/apexcharts/apexcharts.min.js"></script>
   <script src="../../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>

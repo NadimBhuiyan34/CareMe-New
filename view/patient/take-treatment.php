@@ -2,6 +2,11 @@
 session_start();
  
 include_once('../../includes/config.php');
+ if($_SESSION['user']['role'] !='patient')
+{
+         header('Location:../../pages-error.php');
+         exit();
+}
 if (strlen($_SESSION['user']['id']==0)) {
  header('Location:../../logout.php');
   } else{
@@ -77,6 +82,7 @@ if (strlen($_SESSION['user']['id']==0)) {
     <!-- End Page Title -->
 
     <section class="section dashboard row">
+          <?php include_once('../../includes/alert-message.php'); ?>
       <div class="col-xl-6 col-md-6 mb-4 col-6">
                            <!-- <a href="dashboard.php"> -->
                            <div class="card border-info border-3 border-start shadow h-100 py-2">
@@ -157,10 +163,10 @@ if (strlen($_SESSION['user']['id']==0)) {
 
 <div class="row">
 
-<div class="input-group mb-3 col-10 col-xl-5 mx-auto mb-2" >
-  <input type="text" class="form-control shadow" placeholder="Search here" style="border-radius:20px;" id="search">
+<!-- <div class="input-group mb-3 col-10 col-xl-5 mx-auto mb-2" >
+  <input type="text" class="form-control shadow" placeholder="Search here" style="border-radius:20px;">
  
-</div>
+</div> -->
 
 </div>
     
@@ -171,7 +177,7 @@ if (strlen($_SESSION['user']['id']==0)) {
                              JOIN doctor_profiles ON tbluserregistration.id = doctor_profiles.user_id WHERE role = 'doctor' ORDER BY regDate DESC";
                               $users= mysqli_query($con, $doctorSql);
                while ($row = $users->fetch_assoc()) : ?>
-        <div class="col-md-3 col-12  col-xl-4 col-sm-6">
+        <div class="col-md-3 col-12  col-xl-4 col-sm-6 ">
 
             <div class="card p-2 py-3 text-center border-left-info doctor">
 
@@ -188,41 +194,19 @@ if (strlen($_SESSION['user']['id']==0)) {
 
                 <div class="mt-4 apointment d-flex justify-content-center gap-2">
 
-                    <button class="btn btn-success btn-sm" data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">More</button>
-                    <button class="btn btn-success btn-sm" data-bs-toggle="collapse" href="#collapseExample1" role="button" aria-expanded="false" aria-controls="collapseExample1">Treatment</button>
+                  <a href="../../view/patient/doctor-details-patient.php?id=<?php echo $row['emailid']; ?>" class="btn btn-sm btn-primary">More</a>
+                   <a href="../../view/patient/record-problem.php?id=<?php echo $row['user_id'] ?>" class="btn btn-sm btn-success">Take Treatment</a>
     
                 </div>
-                <!-- More  -->
-                <div class="collapse mt-2 shadow" id="collapseExample">
-                    <div class="card card-body">
-                      <p>Education Qualification: Dhaka Medical Collage</p><br>
-                      <p>hdsgbcndbc: ahsgcghgsdb</p>
-                    </div>
-                </div>
-                <!-- Share -->
-                <div class="collapse mt-2 shadow" id="collapseExample1">
-                    <div class="card card-body">
-
-                    <div class="form-floating ">
-
-                    <textarea class="form-control" placeholder="Leave a comment here" id="floatingTextarea2" style="height: 100px"></textarea>
-                    <label for="floatingTextarea2">Share your problem</label>
-                    <br>
-                            <div class="m-auto">
-                            <button class="btn btn-success" type="submit">Submit</button>
-                            </div>
-                    </div>
-                </div>
-            </div>
-            
-      
-</div>
-</div>
-
+               
+         </div>
+      </div>
+                
   <?php endwhile; ?>
  
 
-
+</div>
+</div>
     </section>
 
   </main><!-- End #main -->
@@ -244,6 +228,106 @@ if (strlen($_SESSION['user']['id']==0)) {
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
 
+  <script>
+  const searchBox = document.getElementById('search');
+
+searchBox.addEventListener('input', function () {
+  filterDoctors(searchBox.value.toLowerCase());
+});
+function filterDoctors(query) {
+  const doctors = document.querySelectorAll('.doctor');
+
+  doctors.forEach(function (doctor) {
+    const name = doctor.querySelector('h6').textContent.toLowerCase();
+    const occupation = doctor.querySelector('small').textContent.toLowerCase();
+
+    if (name.includes(query) || occupation.includes(query)) {
+      doctor.style.display = '';
+    } else {
+      doctor.style.display = 'none';
+    }
+  });
+}
+
+  </script>
+
+  <script>
+    const searchInput = document.getElementById('search');
+const suggestionContainer = document.getElementById('suggestion-container');
+
+searchInput.addEventListener('input', displaySuggestions);
+
+function displaySuggestions() {
+  const searchTerm = searchInput.value.trim();
+
+  if (searchTerm !== '') {
+    // Perform AJAX request to fetch suggestions based on the search term
+    fetchSuggestions(searchTerm)
+      .then((suggestions) => {
+        // Display the suggestions in the suggestion container
+        showSuggestions(suggestions);
+      })
+      .catch((error) => {
+        console.error('Error fetching suggestions:', error);
+      });
+  } else {
+    // Clear the suggestion container if the search term is empty
+    clearSuggestions();
+  }
+}
+
+function fetchSuggestions(searchTerm) {
+  // Define your existing data for suggestions
+  const suggestions = ['Suggestion 1', 'Suggestion 2', 'Suggestion 3'];
+
+  // Filter the suggestions based on the search term
+  const filteredSuggestions = suggestions.filter((suggestion) => {
+    return suggestion.toLowerCase().includes(searchTerm.toLowerCase());
+  });
+
+  // Return the filtered suggestions
+  return Promise.resolve(filteredSuggestions);
+}
+ function showSuggestions(suggestions) {
+  // Clear the suggestion container
+  clearSuggestions();
+
+  // Create and append suggestion elements to the container
+  suggestions.forEach((suggestion) => {
+    const suggestionElement = document.createElement('div');
+    suggestionElement.textContent = suggestion;
+    suggestionElement.classList.add('suggestion');
+    suggestionElement.addEventListener('click', () => {
+      // Set the clicked suggestion as the search input value
+      searchInput.value = suggestion;
+      // Clear the suggestion container
+      clearSuggestions();
+      // Show doctors based on the selected suggestion
+      showDoctors(suggestion);
+    });
+    suggestionContainer.appendChild(suggestionElement);
+  });
+}
+
+function showDoctors(suggestion) {
+  // Get all the doctor cards within the "doctordiv" container
+  const doctorCards = document.querySelectorAll('.doctor');
+
+  // Loop through each doctor card and check if the name matches the suggestion
+  doctorCards.forEach((card) => {
+    const fullName = card.querySelector('h6').textContent;
+
+    // Show/hide the card based on the suggestion match
+    if (fullName === suggestion) {
+      card.style.display = 'block';
+    } else {
+      card.style.display = 'none';
+    }
+  });
+}
+
+
+  </script>
   <script>
   document.getElementById("doctorbtn").addEventListener("click", doctor);
   document.getElementById("hospitalbtn").addEventListener("click", hospital);
@@ -291,7 +375,6 @@ if (strlen($_SESSION['user']['id']==0)) {
     }
   
   </script>
-
 
 
   <!-- Vendor JS Files -->

@@ -20,7 +20,7 @@ if (strlen($_SESSION['user']['id']==0)) {
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-  <title>Patient-Prescription</title>
+  <title>Patient-RequestedTreatment</title>
   <meta content="" name="description">
   <meta content="" name="keywords">
 
@@ -65,7 +65,7 @@ if (strlen($_SESSION['user']['id']==0)) {
   <main id="main" class="">
    <div class="d-flex justify-content-between ">
     <div class="pagetitle">
-      <h1>Prescription</h1>
+      <h1>Requested Treatment</h1>
    
       <nav>
         <ol class="breadcrumb">

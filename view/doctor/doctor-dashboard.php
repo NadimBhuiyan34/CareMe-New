@@ -1,3 +1,24 @@
+
+<?php
+session_start();
+
+include_once('../../includes/config.php');
+
+if($_SESSION['user']['role'] !='doctor')
+{
+         header('Location:../../pages-error.php');
+         exit();
+}
+
+if (strlen($_SESSION['user']['id']) == 0) {
+       header('Location:../../logout.php');
+  exit();
+}
+else
+{
+
+ 
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -48,7 +69,7 @@
 <!-- End Sidebar-->
 
   <main id="main" class="main">
-   <div class="d-flex justify-content-between">
+   <div class="d-flex justify-content-between pt-3">
     <div class="pagetitle">
       <h1>Doctor-Dashboard</h1>
    
@@ -110,3 +131,4 @@
 </body>
 
 </html>
+<?php } ?>

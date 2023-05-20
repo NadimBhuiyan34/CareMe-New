@@ -33,8 +33,13 @@ $userpassword=md5($_POST['userpassword']);
      header('location:view/patient/dashboard.php');
     }
     elseif($ret['role']=='doctor'){
-      $_SESSION['aid']=$ret['id'];
-     header('location:doctor-dashboard.php');
+       $_SESSION['user'] = array(
+     'id' => $ret['id'],
+     'device' => $ret['device'],
+    'role' => $ret['role'],
+   
+);
+     header('location:view/doctor/doctor-dashboard.php');
     }
     else{
       session_start(); // Start the session

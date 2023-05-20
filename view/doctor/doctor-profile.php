@@ -29,25 +29,20 @@ if (isset($_POST['update']))
    }
 
     $adid=$_SESSION['user']['id'];
-//   $query="SELECT *
-//      FROM tbluserregistration
-//      JOIN profiles ON tbluserregistration.id = profiles.user_id  WHERE tbluserregistration.id = $adid";
-
-// $ret1=mysqli_query($con,$query);
-//  $row = mysqli_fetch_assoc($ret1);
-
-   $email = $_POST['email'];
+ 
+ 
    $fullname=$_POST['fullName'];
-   $address=$_POST['address'];
-   $proffession=$_POST['proffession'];
-   $mobileNumber=$_POST['mobile'];
-   $birth=$_POST['birth'];
+    $collage=$_POST['collage'];
+   $academic_title=$_POST['academic_title'];
+   $specialties=$_POST['specialties'];
+   $mobile=$_POST['mobile'];
+   $degree=$_POST['degree'];
    $about=$_POST['about'];
    $image=$newFileName??$_POST['profile'];
    
-   $userSql= "UPDATE `tbluserregistration` SET `fullName`='$fullname',`emailid`='$email' WHERE id = $adid";
+   $userSql= "UPDATE `tbluserregistration` SET `fullName`='$fullname' WHERE id = $adid";
 
-   $profileSql="UPDATE `profiles` SET `address`='$address',`mobileNumber`='$mobileNumber',`date_of_birth`='$birth',`about`='$about',`image`='$image',`proffession`='$proffession' WHERE user_id = $adid";
+   $profileSql="UPDATE `doctor_profiles` SET `mobile`='$mobile',`academic_title`='$academic_title',`specialties`='$specialties',`degree`='$degree',`collage`='$collage',`about`='$about',`image`='$image' WHERE user_id=$adid";
   //  mysqli_query($conn, $userSql);
   //  mysqli_query($conn, $profileSql);
    if(mysqli_query($con, $userSql) &&   mysqli_query($con, $profileSql))
@@ -56,7 +51,7 @@ if (isset($_POST['update']))
      $_SESSION['success'] = array('message' => "Profile update Successfull!", 'type' => "success",'icon'=>"fa-square-check");
 
       // Redirect to some page where you want to show the success message
-      header("Location: ../../view/patient/patient-profile.php");
+      header("Location: ../../view/doctor/doctor-profile.php");
            exit();
    }
    else
@@ -65,13 +60,19 @@ if (isset($_POST['update']))
      $_SESSION['success'] = array('message' => "Profile update Fail!",'type' => "danger",'icon'=>"fa-triangle-exclamation");
 
       // Redirect to some page where you want to show the success message
-      header("Location: ../../view/patient/patient-profile.php");
+      header("Location: ../../view/doctor/doctor-profile.php");
            exit();
    }
 
    
 
 
+}
+
+ if($_SESSION['user']['role'] !='doctor')
+{
+         header('Location:../../pages-error.php');
+         exit();
 }
 
 if (strlen($_SESSION['user']['id']==0)) {
@@ -87,7 +88,7 @@ if (strlen($_SESSION['user']['id']==0)) {
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-  <title>Patient-Profile</title>
+  <title>Doctor-Profile</title>
   <meta content="" name="description">
   <meta content="" name="keywords">
   <link href="../../assets/img/title-logo.png" rel="icon">
@@ -134,10 +135,10 @@ if (strlen($_SESSION['user']['id']==0)) {
 $adid=$_SESSION['user']['id'];
 $query="SELECT *
      FROM tbluserregistration
-     JOIN profiles ON tbluserregistration.id = profiles.user_id  WHERE tbluserregistration.id = $adid";
+     JOIN doctor_profiles ON tbluserregistration.id = doctor_profiles.user_id  WHERE tbluserregistration.id = $adid";
  $ret1=mysqli_query($con,$query);
   
-while($row1=mysqli_fetch_array($ret1)){
+while($row=mysqli_fetch_array($ret1)){
 
 ?>
   <main id="main" class="main">
@@ -165,9 +166,9 @@ while($row1=mysqli_fetch_array($ret1)){
           <div class="card">
             <div class="card-body profile-card pt-4 d-flex flex-column align-items-center">
 
-              <img src="../../assets/profile/<?php echo $row1['image'] ?>" alt="Profile" class="rounded-circle border-2 border-info" style="width:150; height:150px">
-              <h5><?php echo $row1['fullName'] ?></h5>
-              <h6><?php echo $row1['proffession'] ?></h6>
+              <img src="../../assets/profile/<?php echo $row['image'] ?>" alt="Profile" class="rounded-circle border-2 border-info" style="width:150; height:150px">
+              <h5><?php echo $row['fullName'] ?></h5>
+              <h6><?php echo $row['role'] ?></h6>
               <div class="social-links mt-2">
                 <a href="#" class="twitter"><i class="bi bi-twitter"></i></a>
                 <a href="#" class="facebook"><i class="bi bi-facebook"></i></a>
@@ -194,54 +195,61 @@ while($row1=mysqli_fetch_array($ret1)){
                   <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-edit">Edit Profile</button>
                 </li>
 
-                <!-- <li class="nav-item">
-                  <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-settings">Settings</button>
-                </li>
-
-                <li class="nav-item">
-                  <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-change-password">Change Password</button>
-                </li> -->
+               
 
               </ul>
               <div class="tab-content pt-2">
 
                 <div class="tab-pane fade show active profile-overview" id="profile-overview">
                   <h5 class="card-title">About</h5>
-                  <p class="small fst-italic"><?php echo $row1['about'] ?></p>
+                  <p class="small fst-italic"><?php echo $row['about'] ?></p>
 
                   <h5 class="card-title">Profile Details</h5>
 
                   <div class="row">
                     <div class="col-lg-3 col-md-4 label col-6">Full Name :</div>
-                    <div class="col-lg-9 col-md-8 col-6"><?php echo $row1['fullName'] ?></div>
+                    <div class="col-lg-9 col-md-8 col-6"><?php echo $row['fullName'] ?></div>
+                  </div>
+                  <hr>
+                   <div class="row">
+                    <div class="col-lg-3 col-md-4 label col-6">Medical Collage :</div>
+                    <div class="col-lg-9 col-md-8 col-6"><?php echo $row['collage'] ?></div>
                   </div>
                   <hr>
                   <div class="row">
-                    <div class="col-lg-3 col-md-4 label col-6">Date of Birth :</div>
-                    <div class="col-lg-9 col-md-8 col-6"><?php echo $row1['date_of_birth'] ?></div>
+                    <div class="col-lg-3 col-md-4 label col-6">Academic Title :</div>
+                    <div class="col-lg-9 col-md-8 col-6"><?php echo $row['academic_title'] ?></div>
                   </div>
                       <hr>
                   <div class="row">
-                    <div class="col-lg-3 col-md-4 label col-6">Proffession :</div>
-                    <div class="col-lg-9 col-md-8 col-6"><?php echo $row1['proffession'] ?></div>
+                    <div class="col-lg-3 col-md-4 label col-6">Specialist :</div>
+                    <div class="col-lg-9 col-md-8 col-6"><?php echo $row['specialties'] ?></div>
                   </div>
                     <hr>
                   <div class="row">
-                    <div class="col-lg-3 col-md-4 label col-6">Address :</div>
-                    <div class="col-lg-9 col-md-8 col-6"><?php echo $row1['address'] ?></div>
+                    <div class="col-lg-3 col-md-4 label col-6">Degree :</div>
+                    <div class="col-lg-9 col-md-8 col-6"><?php echo $row['degree'] ?></div>
                   </div>
                   <hr>
                   <div class="row">
                     <div class="col-lg-3 col-md-4 label col-6">Mobile :</div>
-                    <div class="col-lg-9 col-md-8 col-6"><?php echo $row1['mobileNumber'] ?></div>
+                    <div class="col-lg-9 col-md-8 col-6"><?php echo $row['mobile'] ?></div>
                   </div>
                         <hr>
                   <div class="row">
                     <div class="col-lg-3 col-md-4 label col-6">Email :</div>
-                    <div class="col-lg-9 col-md-8 col-6"><?php echo $row1['emailid'] ?></div>
+                    <div class="col-lg-9 col-md-8 col-6"><?php echo $row['emailid'] ?></div>
                   </div>
 
                 </div>
+
+     
+
+                 
+
+                   
+
+                
 
                 <div class="tab-pane fade profile-edit pt-3" id="profile-edit">
 
@@ -250,14 +258,14 @@ while($row1=mysqli_fetch_array($ret1)){
                     <div class="row mb-3">
                       <label for="profileImage" class="col-md-4 col-lg-3 col-form-label">Profile Image</label>
                       <div class="col-md-8 col-lg-9">
-                        <img src="../../assets/profile/<?php echo $row1['image'] ?>" alt="Profile" style="width:100px; height:100px" id="preview-image">
+                        <img src="../../assets/profile/<?php echo $row['image'] ?>" alt="Profile" style="width:100px; height:100px" id="preview-image">
                         <div class="pt-2 mx-auto">
                          <div class="input-group mb-3 mx-auto">
                         <label class="input-group-text bg-primary rounded-2" for="inputGroupFile01" id="upload-label">
                           <i class="bi bi-upload px-4 text-white rounded-2"></i>
                            </label>
                         <input type="file" class="form-control mx-auto" id="inputGroupFile01" style="display:none" onchange="previewImage()" name="image">
-                        <input type="hidden" name="profile" value="<?php echo $row1['image'] ?>">
+                        <input type="hidden" name="profile" value="<?php echo $row['image'] ?>">
                       </div>
                            
                         </div>
@@ -267,50 +275,50 @@ while($row1=mysqli_fetch_array($ret1)){
                     <div class="row mb-3">
                       <label for="fullName" class="col-md-4 col-lg-3 col-form-label">Full Name</label>
                       <div class="col-md-8 col-lg-9">
-                        <input name="fullName" type="text" class="form-control" id="fullName" value="<?php echo $row1['fullName'] ?>">
+                        <input name="fullName" type="text" class="form-control" id="fullName" value="<?php echo $row['fullName'] ?>">
                       </div>
                     </div>
                    <div class="row mb-3">
-                      <label for="Country" class="col-md-4 col-lg-3 col-form-label">Date of Birth</label>
+                      <label for="collage" class="col-md-4 col-lg-3 col-form-label">Medical Collage</label>
                       <div class="col-md-8 col-lg-9">
-                        <input name="birth" type="date" class="form-control" id="birth" value="<?php echo $row1['date_of_birth'] ?>" required>
+                        <input name="collage" type="text" class="form-control" id="collage" value="<?php echo $row['collage'] ?>" required>
+                      </div>
+                    </div>
+                   <div class="row mb-3">
+                      <label for="academic_title" class="col-md-4 col-lg-3 col-form-label">Academic Title</label>
+                      <div class="col-md-8 col-lg-9">
+                        <input name="academic_title" type="text" class="form-control" id="academic_title" value="<?php echo $row['academic_title'] ?>" required>
+                      </div>
+                    </div>
+                   <div class="row mb-3">
+                      <label for="specialties" class="col-md-4 col-lg-3 col-form-label">Specialist</label>
+                      <div class="col-md-8 col-lg-9">
+                        <input name="specialties" type="text" class="form-control" id="specialties" value="<?php echo $row['specialties'] ?>" required>
+                      </div>
+                    </div>
+                   <div class="row mb-3">
+                      <label for="degree" class="col-md-4 col-lg-3 col-form-label">Degree</label>
+                      <div class="col-md-8 col-lg-9">
+                        <input name="degree" type="text" class="form-control" id="degree" value="<?php echo $row['degree'] ?>" required>
                       </div>
                     </div>
                     <div class="row mb-3">
                       <label for="about" class="col-md-4 col-lg-3 col-form-label">About</label>
                       <div class="col-md-8 col-lg-9">
-                        <textarea name="about" class="form-control" id="about" style="height: 100px"><?php echo $row1['about'] ?></textarea>
+                        <textarea name="about" class="form-control" id="about" style="height: 100px"><?php echo $row['about'] ?></textarea>
                       </div>
                     </div>
 
-                    <div class="row mb-3">
-                      <label for="company" class="col-md-4 col-lg-3 col-form-label">Proffession</label>
-                      <div class="col-md-8 col-lg-9">
-                        <input name="proffession" type="text" class="form-control" id="proffession" value="<?php echo $row1['proffession'] ?>">
-                      </div>
-                    </div>
-
-                  
-                    <div class="row mb-3">
-                      <label for="Address" class="col-md-4 col-lg-3 col-form-label">Address</label>
-                      <div class="col-md-8 col-lg-9">
-                        <input name="address" type="text" class="form-control" id="Address" value="<?php echo $row1['address'] ?>">
-                      </div>
-                    </div>
+                    
 
                     <div class="row mb-3">
                       <label for="Phone" class="col-md-4 col-lg-3 col-form-label">Mobile</label>
                       <div class="col-md-8 col-lg-9">
-                        <input name="mobile" type="text" class="form-control" id="Phone" value="<?php echo $row1['mobileNumber'] ?>" required>
+                        <input name="mobile" type="text" class="form-control" id="Phone" value="<?php echo $row['mobile'] ?>" required>
                       </div>
                     </div>
 
-                <div class="row mb-3">
-  <label for="Email" class="col-md-4 col-lg-3 col-form-label">Email</label>
-  <div class="col-md-8 col-lg-9">
-    <input name="email" type="email" class="form-control" id="Email" value="<?php echo $row1['emailid'] ?>">
-  </div>
-</div>
+ 
 
                     
  
