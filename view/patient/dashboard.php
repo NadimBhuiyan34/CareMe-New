@@ -2,23 +2,18 @@
 session_start();
 
 include_once('../../includes/config.php');
- if($_SESSION['user']['role'] !='patient')
+$adid=$_SESSION['user']['id'];
+$role=$_SESSION['user']['role'];
+ if($role !='patient')
 {
          header('Location:../../pages-error.php');
          exit();
 }
  
-$device_id = $_SESSION['user']['device'];
 
-// Modify your original query to include LIMIT and OFFSET clauses
-$sensor = "SELECT * FROM sensordata WHERE device='$device_id' ORDER BY created_at DESC";
-$result = $con->query($sensor);
+ 
 
-if (!$result) {
-  echo "Error: " . $sensor . "<br>" . $con->error;
-}
-
-if (strlen($_SESSION['user']['id']) == 0) {
+if ($adid == 0) {
        header('Location:../../logout.php');
   exit();
 }
@@ -163,13 +158,22 @@ if (strlen($_SESSION['user']['id']) == 0) {
                             </tr>
                         </thead>
                 <tbody style="font-size:12px">
-          <?php while ($row = $result->fetch_assoc()) : ?>
+          <?php 
+           
+
+// Modify your original query to include LIMIT and OFFSET clauses
+$sensor = "SELECT * FROM sensordata WHERE user_id =$adid ORDER BY created_at DESC";
+ 
+$sensorQuery = mysqli_query($con, $sensor );
+
+          
+          while ($sensorData = $sensorQuery->fetch_assoc()) : ?>
                           <tr>
-                            <td><?php echo $row['room_temperature']; ?></td>
-                            <td><?php echo $row['humidity']; ?></td>
-                            <td><?php echo $row['body_temperature']; ?></td>
-                            <td><?php echo $row['heart_rate']; ?></td>
-                            <td><?php echo date("Y-m-d h:i: A", strtotime($row['created_at'])); ?></td>
+                            <td><?php echo $sensorData['room_temperature']; ?></td>
+                            <td><?php echo $sensorData['humidity']; ?></td>
+                            <td><?php echo $sensorData['body_temperature']; ?></td>
+                            <td><?php echo $sensorData['heart_rate']; ?></td>
+                            <td><?php echo date("Y-m-d h:i: A", strtotime($sensorData['created_at'])); ?></td>
                           </tr>
             <?php endwhile; ?>
                  </tbody>

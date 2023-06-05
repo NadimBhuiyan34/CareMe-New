@@ -1,20 +1,10 @@
-<?php
+ <?php
 session_start();
 require '../../vendor/autoload.php';
 include_once('../../includes/config.php');
 $adid=$_SESSION['user']['id'];
 $role=$_SESSION['user']['role'];
-
-      $ps_id=$_GET['id'];
-      $presSql="SELECT *
-     FROM prescriptions
-     JOIN problems ON prescriptions.pres_id = problems.id WHERE prescriptions.id = $ps_id";
-     $presQuery= mysqli_query($con, $presSql);
-     
-      // doctor sql
-         
- 
- if($role !='patient')
+ if($role !='doctor')
 {
          header('Location:../../pages-error.php');
          exit();
@@ -27,6 +17,81 @@ if ($adid == 0) {
        header('Location:../../logout.php');
   exit();
 }
+if(isset($_POST['submit']))
+{
+        function sendMail($email,$v_code,$password,$name)
+{
+ require '../../vendor/autoload.php';
+    $mail=new PHPMailer(true);  
+try{
+    $mail=new PHPMailer(true);                      //Enable verbose debug output
+    $mail->isSMTP();                                            //Send using SMTP
+    $mail->Host = 'smtp.gmail.com';                     //Set the SMTP server to send through
+    $mail->SMTPAuth   = true;                                   //Enable SMTP authentication
+    $mail->Username   = 'caremeprojectiot@gmail.com';                     //SMTP username
+    $mail->Password   = 'szcjrmgixdxbxjul';                               //SMTP password
+    $mail->SMTPSecure = 'ssl';            
+    $mail->Port       = 465;  
+    $mail->setFrom('caremeprojectiot@gmail.com');
+    $mail->addAddress($email);     //Add a recipient
+    $mail->isHTML(true);                                  //Set email format to HTML
+    $mail->Subject = 'Email Verification from CareMe';
+    
+    $mail->Body = "Dear $name, <br><br>
+    Your Email is: $email <br>
+    Your password is: $password<br><br>
+    please login use this email and password <br><br>
+    Click the link to verify your email: <a href='http://localhost/NiceAdmin/verify.php?v_code=$v_code & email=$email'><button>Verify</button></a> ";
+
+     $mail->send();
+     return true;
+} catch (Exception $e) {
+    echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
+}                   //Enable verbose debug output
+    
+}
+ $doctor_id=$adid;
+  $rx=$_POST['rx'];
+  $test=$_POST['test'];
+  $advice=$_POST['advice'];
+  $pres_id=$_POST['pres_id'];
+  $patient_id=$_POST['patient_id'];
+  $description="Your treatment request have prescribe";
+
+  $prsSql="INSERT INTO `prescriptions`(`pres_id`, `user_id`, `doctor_id`, `rx`, `test`, `advice`) VALUES ('$pres_id','$patient_id','$doctor_id','$rx','$test','$advice')";
+  $notifSql="INSERT INTO `notifications`(`user_id`, `description`, `status`) VALUES ('$patient_id','$description','')";
+  
+   $problemSql="UPDATE `problems` SET `status`='1' WHERE id = $pres_id";
+
+  if(mysqli_query($con, $prsSql) && mysqli_query($con, $notifSql) && mysqli_query($con, $problemSql))
+  {
+     session_start(); 
+     $_SESSION['success'] = array('message' => "Prescription submit Successfull!", 'type' => "success",'icon'=>"fa-square-check");
+
+      // Redirect to some page where you want to show the success message
+      header("Location: ../../view/doctor/requested-treatment.php");
+           exit();
+  }
+  else
+  {
+     
+     session_start(); 
+     $_SESSION['success'] = array('message' => "Prescription not inserted!", 'type' => "danger",'icon'=>"fa-triangle-exclamation");
+
+      // Redirect to some page where you want to show the success message
+      header("Location: ../../view/doctor/requested-treatment.php");
+           exit(); 
+  }
+  
+
+
+  
+      
+
+}
+
+
+ 
 
 ?>
 
@@ -100,121 +165,160 @@ if ($adid == 0) {
   </div>
     <!-- End Page Title -->
 
-    <section class="section dashboard">
-       <?php while ($prescriptionData = $presQuery->fetch_assoc()) : ?>
-         <div class="container d-flex justify-content-center  mb-50">
+    <section class="">
+         <div class=" d-flex justify-content-center  mb-50">
         <div class="row">
             <div class="col-md-12 text-right mb-3 col-12 col-xl-12">
                   <button class="btn btn-primary" id="download"><i class="fa-solid fa-download fa-shake"></i></button>
             </div>
-              
-            <div class="col-md-10 col-xl-12 mx-auto col-12">
+             <?php 
+       $id=$_GET['id'];
+        $presSql="SELECT * FROM problems
+                     WHERE id=$id";
+    $pres= mysqli_query($con, $presSql);
+
+  while ($row = $pres->fetch_assoc()) : 
+      $doctor_id=$row['doctor_id'];
+   $doctorSql = "SELECT *
+              FROM tbluserregistration
+              JOIN doctor_profiles ON tbluserregistration.id = doctor_profiles.user_id
+              WHERE tbluserregistration.id  =$doctor_id";
+      $users= mysqli_query($con, $doctorSql); 
+       
+        while ($doctor = $users->fetch_assoc()) :
+      
+      ?>
+            <div class="col-md-12 col-xl-12  col-12">
                 <div class="card" id="invoice"> 
                     <div class="card-header d-flex flex-column" style="background-color:#f7e3cd">
                        <div class="mx-auto">
                         <img src="../../assets/img/logo4.png" alt=""  style="width:150px; height:50px" alt="logo">
                        </div>
-                  <?php 
-                  $doctor_id=$prescriptionData['doctor_id'];
-                        $doctor_Sql="SELECT *
-                    FROM tbluserregistration
-                    JOIN doctor_profiles ON tbluserregistration.id = doctor_profiles.user_id WHERE tbluserregistration.id = $doctor_id";
-                $doctorQuery= mysqli_query($con, $doctor_Sql);
-                                   while ($doctor_data = $doctorQuery->fetch_assoc()) :
-                  ?>
-                       <div class="mx-auto d-flex flex-column text-dark">
-                          <h5 class="mx-auto fw-bold"><?php echo $doctor_data['fullName'] ?></h5>
-                          <small class="text-center mx-auto"><?php echo $doctor_data['specialties'] ?></small>
-                          <small class="mx-auto"><?php echo $doctor_data['academic_title'] ?>(<?php echo $doctor_data['collage'] ?>)</small>
-                           
-                       </div>
-                        <?php endwhile; ?>
                        
+                       <div class="mx-auto d-flex flex-column text-dark">
+                          <h5 class="mx-auto fw-bold"><?php echo $doctor['fullName'] ?></h5>
+                          <small class="text-center mx-auto"><?php echo $doctor['specialties'] ?></small>
+                          <small class="mx-auto"><?php echo $doctor['academic_title'] ?>,<?php echo $doctor['collage'] ?></small>
+
+                       </div>
                     </div>
-                      <?php 
-                  $patient_id=$prescriptionData['user_id'];
-                        $patient_Sql="SELECT *
-                    FROM tbluserregistration
-                    JOIN profiles ON tbluserregistration.id = profiles.user_id WHERE tbluserregistration.id = $patient_id";
-                $patientQuery= mysqli_query($con, $patient_Sql);
-                                   while ($patient_Data = $patientQuery->fetch_assoc()) :
-                  ?>
+                    <?php
+                        $patient_id=$row['patient_id'];
+              $patientSql = "SELECT *
+              FROM tbluserregistration
+              JOIN profiles ON tbluserregistration.id = profiles.user_id
+              WHERE tbluserregistration.id  =$patient_id";
+          $patient= mysqli_query($con, $patientSql); 
+       
+        while ($patient_data = $patient->fetch_assoc()) :
+                    ?>
                     <div class="card-body">
-                        <div class="row text-black justify-content-between">
-                            <div class="col-sm-6 col-12 col-md-6 col-xl-4">
-                                 <small>Patient Name: <?php echo $patient_Data['fullName'] ?> </small>
+                        <div class="row text-black">
+                            <div class="col-sm-6 col-12 col-md-6 col-xl-3">
+                                 <small>Name: <?php echo $patient_data['fullName'] ?></small>
                             </div>
-                            <div class="col-sm-6 col-12 col-md-6 col-xl-4">
-                               <small>Age: <?php echo date('Y') - date('Y', strtotime($patient_Data['date_of_birth'])); ?></small>
+                               <?php
+                        $dateOfBirth = $patient_data['date_of_birth'];
 
+
+                        $birthDate = new DateTime($dateOfBirth);
+                        $currentDate = new DateTime();
+                        $ageInterval = $currentDate->diff($birthDate);
+                        $years = $ageInterval->y;
+                        ?>
+                            <div class="col-sm-6 col-12 col-md-6 col-xl-3">
+                                 <small>Age: <?php echo $years ?></small>
                             </div>
-                            
-                            <div class="col-sm-6 col-12 col-md-6 col-xl-4 ">
-                                 <small>Date: <?php echo date('j F Y', strtotime($prescriptionData['created_at'])); ?></small>
-
+                            <!-- <div class="col-sm-6 col-12 col-md-6 col-xl-3">
+                                 <small >Address: Narayanganj</small>
+                            </div> -->
+                            <div class="col-sm-6 col-12 col-md-6 col-xl-3">
+                                 <small>Date: <?php echo date("d F Y"); ?></small>
                             </div> 
 
                         
                         </div>
                         <!-- name part end -->
-                           <?php endwhile; ?>
+                          <form action="" method="POST">
                        <div class="row">
-
+              
                         <!-- Symptoms -->
                               <div class="mt-3 text-xl-left text-sm-left text-md-left text-black">
                                    <h5 class="fw-bold">Symptoms</h5>
                                    <hr>
-                             </div> 
+                              </div> 
                              
                              <div class="col-12 col-xl-12">
-                                <p class="text-justify"><?php echo $prescriptionData['problem'] ?> </p>
+                                <p class="text-justify"><?php echo $row['problem'] ?></p>
                              </div>
                              <!-- Rx table -->
                               <div class="text-xl-left text-sm-left text-md-left text-black">
                                    <h5 class="fw-bold">Rx</h5>
                                    <hr>
                              </div> 
-                              <div class="float-left  col-xl-12 col-12 ">
-                        
-                            <p><?php echo $prescriptionData['rx'] ?> </p>
+                              <!-- hidden file -->
+                              <input type="hidden" name="patient_id" value="<?php echo $patient_id ?>">
+                              <input type="hidden" name="pres_id" value="<?php echo $id ?>">
+  
+            <div class="mb-3">
+           <label for="exampleFormControlTextarea2" class="form-label"></label>
+         <textarea class="form-control" id="exampleFormControlTextarea2" rows="3" name="rx">
+    
+          </textarea>
+ 
+   
+             </div>
 
                     
-                       </div>
+                       
                         <div class="mt-3 text-xl-left text-sm-left text-md-left text-black">
                                    <h5 class="fw-bold">Test</h5>
                                    <hr>
                        </div> 
 
-                       <div class="text-left">
-                        <?php echo $prescriptionData['test'] ?> 
-                        
-                       </div>
+                      <div class="mb-3">
+                    <label for="exampleFormControlTextarea1" class="form-label"></label>
+                    <textarea class="form-control" id="exampleFormControlTextarea1" rows="3" name="test">
+                    
+                    </textarea>
+ 
+   
+                      </div>
 
                         <div class="mt-3 text-xl-left text-sm-left text-md-left text-black">
                                    <h5 class="fw-bold">Advice</h5>
                                    <hr>
                        </div> 
 
-                       <div>
-                        <p class="text-justify"> <?php echo $prescriptionData['advice'] ?> </p>
+                     
+                                      <div class="mb-3">
+                    <label for="exampleFormControlTextarea1" class="form-label"></label>
+                    <textarea class="form-control" id="exampleFormControlTextarea1" rows="3" name="advice">
+                      
+                    </textarea>
+              
+                  
+                </div>
+             
+        
                        </div>
+                        <button class="btn btn-primary btn-sm" name="submit">Submit</button>
+                       </form>
                        </div>
                       
                     </div>
                    
-                   
                   
                 </div>
-             
             </div>
-            
         </div>
-        
     </div>
-   <?php endwhile; ?>
+
 
     </section>
-   
+  <?php endwhile; ?>
+  <?php endwhile; ?>
+  <?php endwhile; ?>
   </main><!-- End #main -->
 
   <!-- ======= Footer ======= -->
@@ -233,6 +337,11 @@ if ($adid == 0) {
 
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+
+
+ 
+
+
 
 <!-- pdf generate -->
 <script>

@@ -2,15 +2,22 @@
 session_start();
  
 include_once('../../includes/config.php');
- if($_SESSION['user']['role'] !='doctor')
+
+$adid=$_SESSION['user']['id'];
+$role=$_SESSION['user']['role'];
+ if($role !='doctor')
 {
          header('Location:../../pages-error.php');
          exit();
 }
-if (strlen($_SESSION['user']['id']==0)) {
- header('Location:../../logout.php');
-  } else{
+ 
 
+ 
+
+if ($adid == 0) {
+       header('Location:../../logout.php');
+  exit();
+}
 ?>
 
 <!DOCTYPE html>
@@ -82,21 +89,23 @@ if (strlen($_SESSION['user']['id']==0)) {
     <!-- End Page Title -->
 
     <section class="section dashboard">
-      
+      <?php include_once('../../includes/alert-message.php'); ?>
 <div class="row g-2">
 <?php 
-  $doctor_id= $_SESSION['user']['id'];
- $doctorSql="SELECT * FROM prescriptions
-                     WHERE doctor_id = $doctor_id ORDER BY created_at DESC";
+   
+$doctorSql = "SELECT * FROM problems
+              WHERE doctor_id = $adid AND status = '0'
+              ORDER BY createdAt DESC";
+
     $request= mysqli_query($con, $doctorSql);
 
   while ($row = $request->fetch_assoc()) : 
        $user_id=$row['patient_id'];
-    $query="SELECT *
+    $patientSql="SELECT *
      FROM tbluserregistration
      JOIN profiles ON tbluserregistration.id = profiles.user_id  WHERE tbluserregistration.id = $user_id";
-      $ret1=mysqli_query($con,$query);
-      $user = $ret1->fetch_assoc()
+      $patient=mysqli_query($con,$patientSql);
+    
   ?>
    
  
@@ -106,12 +115,13 @@ if (strlen($_SESSION['user']['id']==0)) {
     <div class="card p-2 py-3 text-center border-left-info">
 
         <div class="img mb-2">
-
+<?php 
+      while ( $user = $patient->fetch_assoc()) :  ?>
           <img src="../../assets/profile/<?php echo $user['image'] ?>" alt="" style="width:70px;height:70px">
             
         </div>
-
-            <h6 style="color:#041f8a"><?php echo $row['created_at'] ?></h6>
+    
+            <h6 style="color:#041f8a"><?php echo $row['createdAt'] ?></h6>
             <small><?php echo $user['fullName'] ?></small>
             <p><?php echo $user['mobileNumber'] ?></p>
 
@@ -119,13 +129,17 @@ if (strlen($_SESSION['user']['id']==0)) {
         <div class="mt-1 apointment d-flex justify-content-center gap-2">
 
             <!-- <a href="" class="btn btn-info btn-sm "><i class="fa-regular fa-eye"></i></a> -->
-            <a href="" class="btn btn-success btn-sm ">Details</a>
+          <a href="../../view/doctor/patient-details.php?id=<?php echo $user['user_id']; ?>&pres_id=<?php echo $row['id']; ?>" class="btn btn-success btn-sm">Details</a>
+
            
         </div>
     </div>
-</div>
-   <?php endwhile; ?>
+    
  
+</div>
+ 
+   <?php endwhile; ?>
+   <?php endwhile; ?>
 
 
     </section>
@@ -165,4 +179,4 @@ if (strlen($_SESSION['user']['id']==0)) {
 </body>
 
 </html>
-<?php } ?>
+ 

@@ -16,9 +16,9 @@ if(isset($_POST['delete']))
          $deleteSql="DELETE FROM `tbluserregistration` WHERE id = $id";
          $deleteConfirm= mysqli_query($con, $deleteSql);
 
-             $_SESSION['success'] = array('message' => "Patients Delete Successfull",'type' => "success",'icon'=>"fa-triangle-exclamation");
+             $_SESSION['success'] = array('message' => "Doctor Delete Successfull",'type' => "success",'icon'=>"fa-triangle-exclamation");
       // Redirect to some page where you want to show the success message
-      header("Location:../../view/admin/patient-index.php");
+      header("Location:../../view/admin/doctor-index.php");
       exit();
 }
 
@@ -30,12 +30,12 @@ if ($adid == 0) {
 }
  
 // $patientSql="SELECT * FROM `tbluserregistration` WHERE role =='patient'";
-$patientSql="SELECT *
+$patientSqlData="SELECT *
      FROM tbluserregistration
      JOIN profiles ON tbluserregistration.id = profiles.user_id WHERE role = 'patient' ORDER BY regDate DESC";
-$PatientQuery= mysqli_query($con, $patientSql);
+$patientsData= mysqli_query($con, $patientSqlData);
 
-$userMobile=$PatientQuery;
+ 
 
  
  
@@ -49,7 +49,7 @@ $userMobile=$PatientQuery;
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-  <title>Admin-Patient</title>
+  <title>Admin-Emergency Patients</title>
   <meta content="" name="description">
   <meta content="" name="keywords">
 
@@ -97,12 +97,13 @@ $userMobile=$PatientQuery;
   <main id="main" class="main">
    <div class="d-flex justify-content-between pt-3">
     <div class="pagetitle">
-      <h1>Patient</h1>
+      <h1>Doctor</h1>
    
       <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-          <li class="breadcrumb-item active">Dashboard</li>
+          <li class="breadcrumb-item"><a href="index.html"><i class="fa-solid fa-backward-fast"></i></a></li>
+          <li class="breadcrumb-item"><a href="index.html"><i class="fa-solid fa-rotate-left"></i></a></li>
+         
         </ol>
       </nav>
       
@@ -112,67 +113,55 @@ $userMobile=$PatientQuery;
     </div>
   </div>
     <!-- End Page Title -->
-  <?php include_once('../../includes/alert-message.php'); ?>
+ <?php include_once('../../includes/alert-message.php'); ?>
    <div class="col-12" id="myTable">
               <div class="card recent-sales overflow-auto" >
 
-                <!-- <div class="filter">
-                  <a class="icon btn btn-info btn-sm" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i>Action</a>
-                  <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                    <li class="dropdown-header text-start">
-                      <h6>Filter</h6>
-                    </li>
-
-                    <li><a class="dropdown-item" href="#">Today</a></li>
-                    <li><a class="dropdown-item" href="#">This Month</a></li>
-                    <li><a class="dropdown-item" href="#">This Year</a></li>
-                  </ul>
-                </div> -->
-                <div class="mt-2 ms-2">
-                   <a href="../../view/admin/patient-registration.php" class="btn btn-primary btn-sm shadow">Patient Registration</a>
-                </div>
+               
+               
                 
 
                 <div class="card-body">
-                  <h5 class="card-title">Patient List <span></span></h5>
+                  <h5 class="card-title">Emergency Patients <span></span></h5>
                  
                   <table class="table datatable">
                     <thead>
                       <tr>
                        
                         <th scope="col">Name</th>
-                        <th scope="col">Email</th>
+                        <th scope="col">Address</th>
                         <th scope="col">Mobile</th>
-                        <th scope="col">BirthDay</th>
-                        <th scope="col">Image</th>
+                        <th scope="col">Body Temperature</th>
+                        <th scope="col">Room Temperature</th>
+                        <th scope="col">Humidity</th>
+                        <th scope="col">Heart Rate</th>
                         <th scope="col">Status</th>
-                        <th scope="col">Action</th>
                       </tr>
                     </thead>
                     <tbody>
-                       <?php while ($row = $PatientQuery->fetch_assoc()) : ?>
-                      <tr>
-                       
-                        <td><?php echo $row['fullName'] ?></td>
-                        <td><?php echo $row['emailid'] ?></td>
-                        <td><?php echo $row['mobileNumber'] ?></td>
-                        <td><?php echo $row['date_of_birth'] ?></td>
-                        <td><img src="../../assets/profile/<?php echo $row['image'] ?>" alt="" style="width:80px;height:80px"></td>
-                       <td> <span class="badge  <?php echo $row['is_varify'] == 1 ? 'text-bg-success' : 'text-bg-danger' ?>"><?php echo $row['is_varify']==1?'Active':'InActive' ?></span></td>
-                                <td>
-  <div class="btn-group">
-    <a href="../../view/admin/patient-details.php?id=<?php echo $row['emailid']; ?>" class="btn btn-sm btn-success me-1"><i class="fa-solid fa-eye"></i></a>
-    <a href="../../view/admin/patient-edit.php?id=<?php echo $row['emailid']; ?>" class="btn btn-sm btn-primary me-1"><i class="fa-solid fa-pen-to-square"></i></a>
-    <form action="" method="POST">
-      <input type="hidden" name="id" value="<?php echo $row['user_id']; ?>">
-      <button class="btn btn-sm btn-danger" type="submit" name="delete">
-             <i class="bi bi-trash"></i> 
-      </button>
+                       <?php while ($data = $patientsData->fetch_assoc()) : ?>
+                     <?php 
+                         $id = $data['user_id'];
+                    $sensorSql = "SELECT * FROM sensordata WHERE user_id = $id AND (body_temperature > 99 OR heart_rate > 100)";
 
-    </form>
-  </div>
-</td>
+                         $sensorData= mysqli_query($con,$sensorSql);
+                      
+                      ?>
+                <?php while ($sensor = $sensorData->fetch_assoc()) : ?>
+                      <tr>
+              
+                        <td><?php echo $data['fullName'] ?></td>
+                        <td><?php echo $data['address'] ?></td>
+                        <td><?php echo $data['mobileNumber'] ?></td>
+                        <td><?php echo $sensor['room_temperature'] ?></td>
+                        <td><?php echo $sensor['body_temperature'] ?></td>
+                        <td><?php echo $sensor['humidity'] ?></td>
+                        <td><?php echo $sensor['heart_rate'] ?></td>
+                        <td></td>
+              
+
                       </tr>
+                       <?php endwhile; ?>
                        <?php endwhile; ?>
                        
                       
@@ -190,13 +179,13 @@ $userMobile=$PatientQuery;
             <!-- mobileDiv -->
                  <div class="row g-2" id="mobileDiv">
                       <div>
-                        <a href="../../view/admin/patient-registration.php" class="btn btn-sm btn-primary mb-2 shadow">Patient Registration</a>
+                        <a href="../../view/admin/doctor-registration.php" class="btn btn-sm btn-primary mb-2 shadow">Doctor Registration</a>
                       </div>
                <?php 
-                  $patientSql="SELECT *
+                  $doctorSql="SELECT *
                               FROM tbluserregistration
-                             JOIN profiles ON tbluserregistration.id = profiles.user_id WHERE role = 'patient' ORDER BY regDate DESC";
-                              $users= mysqli_query($con, $patientSql);
+                             JOIN doctor_profiles ON tbluserregistration.id = doctor_profiles.user_id WHERE role = 'doctor' ORDER BY regDate DESC";
+                              $users= mysqli_query($con, $doctorSql);
                while ($row = $users->fetch_assoc()) : ?>
                   <div class="col-md-3 col-6 col-xl-4 col-sm-6">
 
@@ -209,21 +198,14 @@ $userMobile=$PatientQuery;
                 </div>
 
                 <h6 class="mb-0"><?php echo $row['fullName'] ?></h6>
-                <small><?php echo $row['mobileNumber'] ?></small>
+                <small><?php echo $row['specialties'] ?></small>
 
-                <div class="ratings mt-2">
-
-                    <i class="fa fa-star"></i>
-                    <i class="fa fa-star"></i>
-                    <i class="fa fa-star"></i>
-                    <i class="fa fa-star"></i>
-                    
-                </div>
+                
 
                 <div class="mt-4 apointment d-flex justify-content-center gap-2">
 
-                              <a href="../../view/admin/patient-details.php?id=<?php echo $row['emailid']; ?>" class="btn btn-sm btn-success"><i class="fa-solid fa-eye"></i></a>
-<a href="../../view/admin/patient-edit.php?id=<?php echo $row['emailid']; ?>" class="btn btn-sm btn-primary me-1"><i class="fa-solid fa-pen-to-square"></i></a>
+                   <a href="../../view/admin/doctor-details.php?id=<?php echo $row['emailid']; ?>" class="btn btn-sm btn-success"><i class="fa-solid fa-eye"></i></a>
+<a href="../../view/admin/doctor-edit.php?id=<?php echo $row['emailid']; ?>" class="btn btn-sm btn-primary me-1"><i class="fa-solid fa-pen-to-square"></i></a>
     <form action="" method="POST">
       <input type="hidden" name="id" value="<?php echo $row['user_id']; ?>">
       <button class="btn btn-sm btn-danger" type="submit" name="delete">
@@ -231,6 +213,7 @@ $userMobile=$PatientQuery;
       </button>
 
     </form>
+    
                 </div>
                 <!-- More  -->
                  

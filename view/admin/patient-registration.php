@@ -5,11 +5,22 @@ include_once('../../includes/config.php');
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
- if($_SESSION['user']['role'] !='admin')
+ $adid=$_SESSION['user']['id'];
+$role=$_SESSION['user']['role'];
+ if($role !='admin')
 {
          header('Location:../../pages-error.php');
          exit();
 }
+ 
+
+ 
+
+if ($adid == 0) {
+       header('Location:../../logout.php');
+  exit();
+}
+ 
 
  if(isset($_POST['submit']))
  {
@@ -160,11 +171,7 @@ else
 
  }
 
-if (strlen($_SESSION['user']['id']) == 0) {
-       header('Location:../../logout.php');
-  exit();
-}
-
+ 
  
 ?>
 

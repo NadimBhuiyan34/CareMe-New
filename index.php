@@ -42,9 +42,9 @@ $userpassword=md5($_POST['userpassword']);
      header('location:view/doctor/doctor-dashboard.php');
     }
     else{
-      session_start(); // Start the session
+       
       // Perform some action and set a success message
-      $_SESSION['success'] = "Your email or password is not correct!";
+       $_SESSION['success'] = array('message' => "Email or Password is not Correct",'type' => "danger",'icon'=>"fa-triangle-exclamation");
       // Redirect to some page where you want to show the success message
       header("Location: index.php");
       exit();
@@ -61,12 +61,12 @@ $userpassword=md5($_POST['userpassword']);
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-  <title>Pages / Login - NiceAdmin Bootstrap Template</title>
+  <title>CareMe / Login</title>
   <meta content="" name="description">
   <meta content="" name="keywords">
 
   <!-- Favicons -->
-  <link href="assets/img/favicon.png" rel="icon">
+   <link href="assets/img/title-logo.png" rel="icon">
   <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
 
   <!-- Google Fonts -->
@@ -98,7 +98,7 @@ $userpassword=md5($_POST['userpassword']);
 
   <main>
     <div class="container">
-
+    
       <section class="section register min-vh-100 d-flex flex-column align-items-center justify-content-center py-4">
         <div class="container">
           <div class="row justify-content-center">
@@ -112,12 +112,12 @@ $userpassword=md5($_POST['userpassword']);
               </div> -->
 
               <div class="card mb-3">
-
+<?php include_once('includes/alert-message.php'); ?>
                 <div class="card-body">
 
                   <div class="pt-4 pb-2 mx-auto text-center">
                      <img src="assets/img/logo4.png" alt="" style="height:70px; width:150px" class="mx-auto">
-                    <h6 class="card-title text-center pb-0">Login to Your Account</h6>
+                  
                    <!-- <p>Login to Your Account</p> -->
                   </div>
 

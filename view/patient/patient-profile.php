@@ -5,7 +5,9 @@ session_start();
 require '../../vendor/autoload.php';
  
 include_once('../../includes/config.php');
- 
+$adid=$_SESSION['user']['id'];
+$role=$_SESSION['user']['role'];
+
 if (isset($_POST['update'])) 
 
 {
@@ -28,14 +30,8 @@ if (isset($_POST['update']))
       // Image upload successful
    }
 
-    $adid=$_SESSION['user']['id'];
-//   $query="SELECT *
-//      FROM tbluserregistration
-//      JOIN profiles ON tbluserregistration.id = profiles.user_id  WHERE tbluserregistration.id = $adid";
-
-// $ret1=mysqli_query($con,$query);
-//  $row = mysqli_fetch_assoc($ret1);
-
+  
+ 
    $email = $_POST['email'];
    $fullname=$_POST['fullName'];
    $address=$_POST['address'];
@@ -74,10 +70,10 @@ if (isset($_POST['update']))
 
 }
 
-if (strlen($_SESSION['user']['id']==0)) {
- header('Location:../../logout.php');
-  } else{
-
+if ( $adid == 0) {
+       header('Location:../../logout.php');
+  exit();
+}
 ?>
  
  <!DOCTYPE html>
@@ -126,18 +122,18 @@ if (strlen($_SESSION['user']['id']==0)) {
 
 
   <!-- ======= Sidebar ======= -->
-  <?php include_once('../../includes/header.php'); ?>
+   <?php include_once('../../includes/header.php'); ?>
   <?php include_once('../../includes/sidebar.php'); ?>
  <!-- End Sidebar-->
-  <?php if($_SESSION['user']['id']):?>
+ 
 <?php 
-$adid=$_SESSION['user']['id'];
-$query="SELECT *
+ 
+$patientProfileSql="SELECT *
      FROM tbluserregistration
      JOIN profiles ON tbluserregistration.id = profiles.user_id  WHERE tbluserregistration.id = $adid";
- $ret1=mysqli_query($con,$query);
+ $sqlData=mysqli_query($con,$patientProfileSql);
   
-while($row1=mysqli_fetch_array($ret1)){
+while($patientProfileData=mysqli_fetch_array($sqlData)){
 
 ?>
   <main id="main" class="main">
@@ -165,9 +161,9 @@ while($row1=mysqli_fetch_array($ret1)){
           <div class="card">
             <div class="card-body profile-card pt-4 d-flex flex-column align-items-center">
 
-              <img src="../../assets/profile/<?php echo $row1['image'] ?>" alt="Profile" class="rounded-circle border-2 border-info" style="width:150; height:150px">
-              <h5><?php echo $row1['fullName'] ?></h5>
-              <h6><?php echo $row1['proffession'] ?></h6>
+              <img src="../../assets/profile/<?php echo $patientProfileData['image'] ?>" alt="Profile" class="rounded-circle border-2 border-info" style="width:150; height:150px">
+              <h5><?php echo $patientProfileData['fullName'] ?></h5>
+              <h6><?php echo $patientProfileData['proffession'] ?></h6>
               <div class="social-links mt-2">
                 <a href="#" class="twitter"><i class="bi bi-twitter"></i></a>
                 <a href="#" class="facebook"><i class="bi bi-facebook"></i></a>
@@ -207,38 +203,38 @@ while($row1=mysqli_fetch_array($ret1)){
 
                 <div class="tab-pane fade show active profile-overview" id="profile-overview">
                   <h5 class="card-title">About</h5>
-                  <p class="small fst-italic"><?php echo $row1['about'] ?></p>
+                  <p class="small fst-italic"><?php echo $patientProfileData['about'] ?></p>
 
                   <h5 class="card-title">Profile Details</h5>
 
                   <div class="row">
                     <div class="col-lg-3 col-md-4 label col-6">Full Name :</div>
-                    <div class="col-lg-9 col-md-8 col-6"><?php echo $row1['fullName'] ?></div>
+                    <div class="col-lg-9 col-md-8 col-6"><?php echo $patientProfileData['fullName'] ?></div>
                   </div>
                   <hr>
                   <div class="row">
                     <div class="col-lg-3 col-md-4 label col-6">Date of Birth :</div>
-                    <div class="col-lg-9 col-md-8 col-6"><?php echo $row1['date_of_birth'] ?></div>
+                    <div class="col-lg-9 col-md-8 col-6"><?php echo $patientProfileData['date_of_birth'] ?></div>
                   </div>
                       <hr>
                   <div class="row">
                     <div class="col-lg-3 col-md-4 label col-6">Proffession :</div>
-                    <div class="col-lg-9 col-md-8 col-6"><?php echo $row1['proffession'] ?></div>
+                    <div class="col-lg-9 col-md-8 col-6"><?php echo $patientProfileData['proffession'] ?></div>
                   </div>
                     <hr>
                   <div class="row">
                     <div class="col-lg-3 col-md-4 label col-6">Address :</div>
-                    <div class="col-lg-9 col-md-8 col-6"><?php echo $row1['address'] ?></div>
+                    <div class="col-lg-9 col-md-8 col-6"><?php echo $patientProfileData['address'] ?></div>
                   </div>
                   <hr>
                   <div class="row">
                     <div class="col-lg-3 col-md-4 label col-6">Mobile :</div>
-                    <div class="col-lg-9 col-md-8 col-6"><?php echo $row1['mobileNumber'] ?></div>
+                    <div class="col-lg-9 col-md-8 col-6"><?php echo $patientProfileData['mobileNumber'] ?></div>
                   </div>
                         <hr>
                   <div class="row">
                     <div class="col-lg-3 col-md-4 label col-6">Email :</div>
-                    <div class="col-lg-9 col-md-8 col-6"><?php echo $row1['emailid'] ?></div>
+                    <div class="col-lg-9 col-md-8 col-6"><?php echo $patientProfileData['emailid'] ?></div>
                   </div>
 
                 </div>
@@ -250,14 +246,14 @@ while($row1=mysqli_fetch_array($ret1)){
                     <div class="row mb-3">
                       <label for="profileImage" class="col-md-4 col-lg-3 col-form-label">Profile Image</label>
                       <div class="col-md-8 col-lg-9">
-                        <img src="../../assets/profile/<?php echo $row1['image'] ?>" alt="Profile" style="width:100px; height:100px" id="preview-image">
+                        <img src="../../assets/profile/<?php echo $patientProfileData['image'] ?>" alt="Profile" style="width:100px; height:100px" id="preview-image">
                         <div class="pt-2 mx-auto">
                          <div class="input-group mb-3 mx-auto">
                         <label class="input-group-text bg-primary rounded-2" for="inputGroupFile01" id="upload-label">
                           <i class="bi bi-upload px-4 text-white rounded-2"></i>
                            </label>
                         <input type="file" class="form-control mx-auto" id="inputGroupFile01" style="display:none" onchange="previewImage()" name="image">
-                        <input type="hidden" name="profile" value="<?php echo $row1['image'] ?>">
+                        <input type="hidden" name="profile" value="<?php echo $patientProfileData['image'] ?>">
                       </div>
                            
                         </div>
@@ -267,26 +263,26 @@ while($row1=mysqli_fetch_array($ret1)){
                     <div class="row mb-3">
                       <label for="fullName" class="col-md-4 col-lg-3 col-form-label">Full Name</label>
                       <div class="col-md-8 col-lg-9">
-                        <input name="fullName" type="text" class="form-control" id="fullName" value="<?php echo $row1['fullName'] ?>">
+                        <input name="fullName" type="text" class="form-control" id="fullName" value="<?php echo $patientProfileData['fullName'] ?>">
                       </div>
                     </div>
                    <div class="row mb-3">
                       <label for="Country" class="col-md-4 col-lg-3 col-form-label">Date of Birth</label>
                       <div class="col-md-8 col-lg-9">
-                        <input name="birth" type="date" class="form-control" id="birth" value="<?php echo $row1['date_of_birth'] ?>" required>
+                        <input name="birth" type="date" class="form-control" id="birth" value="<?php echo $patientProfileData['date_of_birth'] ?>" required>
                       </div>
                     </div>
                     <div class="row mb-3">
                       <label for="about" class="col-md-4 col-lg-3 col-form-label">About</label>
                       <div class="col-md-8 col-lg-9">
-                        <textarea name="about" class="form-control" id="about" style="height: 100px"><?php echo $row1['about'] ?></textarea>
+                        <textarea name="about" class="form-control" id="about" style="height: 100px"><?php echo $patientProfileData['about'] ?></textarea>
                       </div>
                     </div>
 
                     <div class="row mb-3">
                       <label for="company" class="col-md-4 col-lg-3 col-form-label">Proffession</label>
                       <div class="col-md-8 col-lg-9">
-                        <input name="proffession" type="text" class="form-control" id="proffession" value="<?php echo $row1['proffession'] ?>">
+                        <input name="proffession" type="text" class="form-control" id="proffession" value="<?php echo $patientProfileData['proffession'] ?>">
                       </div>
                     </div>
 
@@ -294,21 +290,21 @@ while($row1=mysqli_fetch_array($ret1)){
                     <div class="row mb-3">
                       <label for="Address" class="col-md-4 col-lg-3 col-form-label">Address</label>
                       <div class="col-md-8 col-lg-9">
-                        <input name="address" type="text" class="form-control" id="Address" value="<?php echo $row1['address'] ?>">
+                        <input name="address" type="text" class="form-control" id="Address" value="<?php echo $patientProfileData['address'] ?>">
                       </div>
                     </div>
 
                     <div class="row mb-3">
                       <label for="Phone" class="col-md-4 col-lg-3 col-form-label">Mobile</label>
                       <div class="col-md-8 col-lg-9">
-                        <input name="mobile" type="text" class="form-control" id="Phone" value="<?php echo $row1['mobileNumber'] ?>" required>
+                        <input name="mobile" type="text" class="form-control" id="Phone" value="<?php echo $patientProfileData['mobileNumber'] ?>" required>
                       </div>
                     </div>
 
                 <div class="row mb-3">
   <label for="Email" class="col-md-4 col-lg-3 col-form-label">Email</label>
   <div class="col-md-8 col-lg-9">
-    <input name="email" type="email" class="form-control" id="Email" value="<?php echo $row1['emailid'] ?>">
+    <input name="email" type="email" class="form-control" id="Email" value="<?php echo $patientProfileData['emailid'] ?>">
   </div>
 </div>
 
@@ -323,47 +319,7 @@ while($row1=mysqli_fetch_array($ret1)){
 
                 </div>
 
-                <div class="tab-pane fade pt-3" id="profile-settings">
-
-                  <!-- Settings Form -->
-                  <form>
-
-                    <div class="row mb-3">
-                      <label for="fullName" class="col-md-4 col-lg-3 col-form-label">Email Notifications</label>
-                      <div class="col-md-8 col-lg-9">
-                        <div class="form-check">
-                          <input class="form-check-input" type="checkbox" id="changesMade" checked>
-                          <label class="form-check-label" for="changesMade">
-                            Changes made to your account
-                          </label>
-                        </div>
-                        <div class="form-check">
-                          <input class="form-check-input" type="checkbox" id="newProducts" checked>
-                          <label class="form-check-label" for="newProducts">
-                            Information on new products and services
-                          </label>
-                        </div>
-                        <div class="form-check">
-                          <input class="form-check-input" type="checkbox" id="proOffers">
-                          <label class="form-check-label" for="proOffers">
-                            Marketing and promo offers
-                          </label>
-                        </div>
-                        <div class="form-check">
-                          <input class="form-check-input" type="checkbox" id="securityNotify" checked disabled>
-                          <label class="form-check-label" for="securityNotify">
-                            Security alerts
-                          </label>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div class="text-center">
-                      <button type="submit" class="btn btn-primary">Save Changes</button>
-                    </div>
-                  </form><!-- End settings Form -->
-
-                </div>
+               
 
                 <div class="tab-pane fade pt-3" id="profile-change-password">
                   <!-- Change Password Form -->
@@ -407,18 +363,7 @@ while($row1=mysqli_fetch_array($ret1)){
     </section>
 
   </main><!-- End #main -->
-<div id="myModal" class="modal fade" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-body">
-        <p id="messageText">Email has been modified. Click OK to save changes.</p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-primary" id="okButton" data-bs-dismiss="modal">OK</button>
-      </div>
-    </div>
-  </div>
-</div>
+ 
 
   <!-- ======= Footer ======= -->
   <footer id="footer" class="footer">
@@ -434,27 +379,10 @@ while($row1=mysqli_fetch_array($ret1)){
     </div>
   </footer><!-- End Footer -->
 <?php } ?>
-  <?php endif;?>
+ 
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
-<script>
-  const emailInput = document.getElementById('Email');
-  const messageText = document.getElementById('messageText');
-  const okButton = document.getElementById('okButton');
-  let originalEmailValue = emailInput.value;
-
-  emailInput.addEventListener('input', function() {
-    if (emailInput.value !== originalEmailValue) {
-      messageText.textContent = 'Email has been modified. Click OK to save changes.';
-      $('#myModal').modal('show');
-    }
-  });
-
-  okButton.addEventListener('click', function() {
-    originalEmailValue = emailInput.value;
-    $('#myModal').modal('hide');
-  });
-</script>
+ 
 
 
 
@@ -494,4 +422,4 @@ while($row1=mysqli_fetch_array($ret1)){
 </body>
 
 </html>
-<?php } ?>
+ 

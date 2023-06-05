@@ -6,16 +6,22 @@ require '../../vendor/autoload.php';
  
 include_once('../../includes/config.php');
 
- if($_SESSION['user']['role'] !='admin')
+$adid=$_SESSION['user']['id'];
+$role=$_SESSION['user']['role'];
+ if($role !='admin')
 {
          header('Location:../../pages-error.php');
          exit();
 }
+ 
 
-if (strlen($_SESSION['user']['id']==0)) {
- header('Location:../../logout.php');
-  } else{
+ 
 
+if ($adid == 0) {
+       header('Location:../../logout.php');
+  exit();
+}
+ 
 ?>
  
  <!DOCTYPE html>
@@ -350,5 +356,5 @@ if (strlen($_SESSION['user']['id']==0)) {
 </body>
 
 </html>
-<?php } ?>
+ 
  

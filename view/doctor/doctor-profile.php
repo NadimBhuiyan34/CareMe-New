@@ -5,7 +5,8 @@ session_start();
 require '../../vendor/autoload.php';
  
 include_once('../../includes/config.php');
- 
+ $adid=$_SESSION['user']['id'];
+$role=$_SESSION['user']['role'];
 if (isset($_POST['update'])) 
 
 {
@@ -28,7 +29,7 @@ if (isset($_POST['update']))
       // Image upload successful
    }
 
-    $adid=$_SESSION['user']['id'];
+ 
  
  
    $fullname=$_POST['fullName'];
@@ -69,16 +70,19 @@ if (isset($_POST['update']))
 
 }
 
- if($_SESSION['user']['role'] !='doctor')
+ if($role !='doctor')
 {
          header('Location:../../pages-error.php');
          exit();
 }
+ 
 
-if (strlen($_SESSION['user']['id']==0)) {
- header('Location:../../logout.php');
-  } else{
+ 
 
+if ($adid == 0) {
+       header('Location:../../logout.php');
+  exit();
+}
 ?>
  
  <!DOCTYPE html>
@@ -130,9 +134,9 @@ if (strlen($_SESSION['user']['id']==0)) {
   <?php include_once('../../includes/header.php'); ?>
   <?php include_once('../../includes/sidebar.php'); ?>
  <!-- End Sidebar-->
-  <?php if($_SESSION['user']['id']):?>
+ 
 <?php 
-$adid=$_SESSION['user']['id'];
+ 
 $query="SELECT *
      FROM tbluserregistration
      JOIN doctor_profiles ON tbluserregistration.id = doctor_profiles.user_id  WHERE tbluserregistration.id = $adid";
@@ -442,7 +446,7 @@ while($row=mysqli_fetch_array($ret1)){
     </div>
   </footer><!-- End Footer -->
 <?php } ?>
-  <?php endif;?>
+ 
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
 <script>
@@ -502,4 +506,4 @@ while($row=mysqli_fetch_array($ret1)){
 </body>
 
 </html>
-<?php } ?>
+ 

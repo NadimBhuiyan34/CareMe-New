@@ -2,6 +2,7 @@
 // session_start(); // Start the session
 if(isset($_SESSION['success'])){
 ?>
+
  <div class="my-toast alert alert-<?php echo $_SESSION['success']['type'] ?> alert-dismissible fade show" role="alert" id="alert-message">
   <div class="text-black ">
     <i class="fa-solid <?php echo $_SESSION['success']['icon'] ?> fa-bounce fa-lg mr-2"></i>

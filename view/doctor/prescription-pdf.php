@@ -5,16 +5,16 @@ include_once('../../includes/config.php');
 $adid=$_SESSION['user']['id'];
 $role=$_SESSION['user']['role'];
 
-      $ps_id=$_GET['id'];
+      $psId=$_GET['presId'];
       $presSql="SELECT *
      FROM prescriptions
-     JOIN problems ON prescriptions.pres_id = problems.id WHERE prescriptions.id = $ps_id";
-     $presQuery= mysqli_query($con, $presSql);
+     JOIN problems ON prescriptions.pres_id = problems.id WHERE prescriptions.id = $psId";
+     $presQuery= mysqli_query($con,$presSql);
      
       // doctor sql
          
  
- if($role !='patient')
+ if($role !='doctor')
 {
          header('Location:../../pages-error.php');
          exit();
@@ -115,12 +115,12 @@ if ($adid == 0) {
                         <img src="../../assets/img/logo4.png" alt=""  style="width:150px; height:50px" alt="logo">
                        </div>
                   <?php 
-                  $doctor_id=$prescriptionData['doctor_id'];
+                  $d_id=$prescriptionData['doctor_id'];
                         $doctor_Sql="SELECT *
                     FROM tbluserregistration
-                    JOIN doctor_profiles ON tbluserregistration.id = doctor_profiles.user_id WHERE tbluserregistration.id = $doctor_id";
+                    JOIN doctor_profiles ON tbluserregistration.id = doctor_profiles.user_id WHERE tbluserregistration.id = $d_id";
                 $doctorQuery= mysqli_query($con, $doctor_Sql);
-                                   while ($doctor_data = $doctorQuery->fetch_assoc()) :
+                     while ($doctor_data = $doctorQuery->fetch_assoc()) :
                   ?>
                        <div class="mx-auto d-flex flex-column text-dark">
                           <h5 class="mx-auto fw-bold"><?php echo $doctor_data['fullName'] ?></h5>
@@ -137,7 +137,7 @@ if ($adid == 0) {
                     FROM tbluserregistration
                     JOIN profiles ON tbluserregistration.id = profiles.user_id WHERE tbluserregistration.id = $patient_id";
                 $patientQuery= mysqli_query($con, $patient_Sql);
-                                   while ($patient_Data = $patientQuery->fetch_assoc()) :
+                   while ($patient_Data = $patientQuery->fetch_assoc()) :
                   ?>
                     <div class="card-body">
                         <div class="row text-black justify-content-between">

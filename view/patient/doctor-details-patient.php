@@ -5,16 +5,22 @@ session_start();
 require '../../vendor/autoload.php';
  
 include_once('../../includes/config.php');
- if($_SESSION['user']['role'] !='patient')
+$adid=$_SESSION['user']['id'];
+$role=$_SESSION['user']['role'];
+ if($role !='patient')
 {
          header('Location:../../pages-error.php');
          exit();
 }
  
 
-if (strlen($_SESSION['user']['id']==0)) {
- header('Location:../../logout.php');
-  } else{
+ 
+
+if ($adid == 0) {
+       header('Location:../../logout.php');
+  exit();
+}
+
 
 ?>
  
@@ -74,8 +80,8 @@ if (strlen($_SESSION['user']['id']==0)) {
               FROM tbluserregistration
               JOIN doctor_profiles ON tbluserregistration.id = doctor_profiles.user_id
               WHERE emailid ='$id'";
-      $users= mysqli_query($con, $doctorSql); 
-      $row = mysqli_fetch_assoc($users);
+      $doctorQuery= mysqli_query($con, $doctorSql); 
+      $doctorData = mysqli_fetch_assoc($doctorQuery);
       
       ?>
  
@@ -83,7 +89,7 @@ if (strlen($_SESSION['user']['id']==0)) {
 <?php include_once('../../includes/alert-message.php'); ?>
      <div class="d-flex justify-content-between pt-3">
     <div class="pagetitle">
-      <h1><?php echo $row['fullName'] ?></h1>
+      <h1><?php echo  $doctorData['fullName'] ?></h1>
    
       <nav>
         <ol class="breadcrumb">
@@ -104,9 +110,9 @@ if (strlen($_SESSION['user']['id']==0)) {
           <div class="card">
             <div class="card-body profile-card pt-4 d-flex flex-column align-items-center">
 
-              <img src="../../assets/profile/<?php echo $row['image'] ?>" alt="Profile" class="rounded-circle border-2 border-info" style="width:150; height:150px">
-              <h5><?php echo $row['fullName'] ?></h5>
-             <span class="badge  <?php echo $row['is_varify'] == 1 ? 'text-bg-success' : 'text-bg-danger' ?>"><?php echo $row['is_varify']==1?'Active':'InActive' ?></span>
+              <img src="../../assets/profile/<?php echo $doctorData['image'] ?>" alt="Profile" class="rounded-circle border-2 border-info" style="width:150; height:150px">
+              <h5><?php echo  $doctorData['fullName'] ?></h5>
+             <span class="badge  <?php echo  $doctorData['is_varify'] == 1 ? 'text-bg-success' : 'text-bg-danger' ?>"><?php echo  $doctorData['is_varify']==1?'Active':'InActive' ?></span>
               <div class="social-links mt-2">
                 <a href="#" class="twitter"><i class="bi bi-twitter"></i></a>
                 <a href="#" class="facebook"><i class="bi bi-facebook"></i></a>
@@ -140,43 +146,43 @@ if (strlen($_SESSION['user']['id']==0)) {
 
                 <div class="tab-pane fade show active profile-overview" id="profile-overview">
                   <h5 class="card-title">About</h5>
-                  <p class="small fst-italic"><?php echo $row['about'] ?></p>
+                  <p class="small fst-italic"><?php echo  $doctorData['about'] ?></p>
 
                   <h5 class="card-title">Profile Details</h5>
 
                   <div class="row">
                     <div class="col-lg-3 col-md-4 label col-6">Full Name :</div>
-                    <div class="col-lg-9 col-md-8 col-6"><?php echo $row['fullName'] ?></div>
+                    <div class="col-lg-9 col-md-8 col-6"><?php echo  $doctorData['fullName'] ?></div>
                   </div>
                   <hr>
                    <div class="row">
                     <div class="col-lg-3 col-md-4 label col-6">Medical Collage :</div>
-                    <div class="col-lg-9 col-md-8 col-6"><?php echo $row['collage'] ?></div>
+                    <div class="col-lg-9 col-md-8 col-6"><?php echo  $doctorData['collage'] ?></div>
                   </div>
                   <hr>
                   <div class="row">
                     <div class="col-lg-3 col-md-4 label col-6">Academic Title :</div>
-                    <div class="col-lg-9 col-md-8 col-6"><?php echo $row['academic_title'] ?></div>
+                    <div class="col-lg-9 col-md-8 col-6"><?php echo  $doctorData['academic_title'] ?></div>
                   </div>
                       <hr>
                   <div class="row">
                     <div class="col-lg-3 col-md-4 label col-6">Specialist :</div>
-                    <div class="col-lg-9 col-md-8 col-6"><?php echo $row['specialties'] ?></div>
+                    <div class="col-lg-9 col-md-8 col-6"><?php echo  $doctorData['specialties'] ?></div>
                   </div>
                     <hr>
                   <div class="row">
                     <div class="col-lg-3 col-md-4 label col-6">Degree :</div>
-                    <div class="col-lg-9 col-md-8 col-6"><?php echo $row['degree'] ?></div>
+                    <div class="col-lg-9 col-md-8 col-6"><?php echo  $doctorData['degree'] ?></div>
                   </div>
                   <hr>
                   <div class="row">
                     <div class="col-lg-3 col-md-4 label col-6">Mobile :</div>
-                    <div class="col-lg-9 col-md-8 col-6"><?php echo $row['mobile'] ?></div>
+                    <div class="col-lg-9 col-md-8 col-6"><?php echo  $doctorData['mobile'] ?></div>
                   </div>
                         <hr>
                   <div class="row">
                     <div class="col-lg-3 col-md-4 label col-6">Email :</div>
-                    <div class="col-lg-9 col-md-8 col-6"><?php echo $row['emailid'] ?></div>
+                    <div class="col-lg-9 col-md-8 col-6"><?php echo $doctorData['emailid'] ?></div>
                   </div>
 
                 </div>
@@ -233,5 +239,5 @@ if (strlen($_SESSION['user']['id']==0)) {
 </body>
 
 </html>
-<?php } ?>
+ 
  

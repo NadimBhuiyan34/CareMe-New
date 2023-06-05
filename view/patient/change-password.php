@@ -5,7 +5,8 @@ session_start();
 require '../../vendor/autoload.php';
  
 include_once('../../includes/config.php');
- 
+ $adid=$_SESSION['user']['id'];
+$role=$_SESSION['user']['role'];
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Step 2: Validate the form data
     $currentPassword = $_POST['password'];
@@ -33,19 +34,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Step 3: Perform the password change operation
         // Here you can write the code to update the user's password in your database
         // You may need to adapt this code to your specific database and password hashing mechanism
-
-        // Example code to update the password
-
-        $userId = $_SESSION['user']['id']; // Assuming you have a user ID stored in the session
+ 
         $hashedNewPassword = md5($newPassword); // Hash the new password
         $hashedcurrentPassword = md5($currentPassword); // Hash the new password
-        $passwordSql=  "SELECT  `loginPassword` FROM `tbluserregistration` WHERE id=      $userId";
-        $result=mysqli_query($con, $passwordSql);
-        $row = mysqli_fetch_assoc($result);
-          if($row['loginPassword']==$hashedcurrentPassword)
+        $passwordSql=  "SELECT  `loginPassword` FROM `tbluserregistration` WHERE id=      $adid";
+        $passwordQuery=mysqli_query($con, $passwordSql);
+        $passwordData = mysqli_fetch_assoc($passwordQuery);
+          if($passwordData['loginPassword']==$hashedcurrentPassword)
           {
-               $query = "UPDATE tbluserregistration SET loginPassword = '$hashedNewPassword' WHERE id = $userId";
-              $save=mysqli_query($con, $query);
+               $updateSql = "UPDATE tbluserregistration SET loginPassword = '$hashedNewPassword' WHERE id = $adid";
+              $save=mysqli_query($con, $updateSql );
               if($save)
               {
                   session_start(); 

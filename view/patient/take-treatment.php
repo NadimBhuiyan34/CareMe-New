@@ -2,15 +2,22 @@
 session_start();
  
 include_once('../../includes/config.php');
- if($_SESSION['user']['role'] !='patient')
+$adid=$_SESSION['user']['id'];
+$role=$_SESSION['user']['role'];
+ 
+ if($role !='patient')
 {
          header('Location:../../pages-error.php');
          exit();
 }
-if (strlen($_SESSION['user']['id']==0)) {
- header('Location:../../logout.php');
-  } else{
+ 
 
+ 
+
+if ($adid == 0) {
+       header('Location:../../logout.php');
+  exit();
+}
 ?>
 
 <!DOCTYPE html>
@@ -176,26 +183,26 @@ if (strlen($_SESSION['user']['id']==0)) {
                               FROM tbluserregistration
                              JOIN doctor_profiles ON tbluserregistration.id = doctor_profiles.user_id WHERE role = 'doctor' ORDER BY regDate DESC";
                               $users= mysqli_query($con, $doctorSql);
-               while ($row = $users->fetch_assoc()) : ?>
+               while ($Doctor_data = $users->fetch_assoc()) : ?>
         <div class="col-md-3 col-12  col-xl-4 col-sm-6 ">
 
             <div class="card p-2 py-3 text-center border-left-info doctor">
 
                 <div class="img mb-2">
 
-                 <img src="../../assets/profile/<?php echo $row['image'] ?>" width="70" class="rounded-circle" height="70px">
+                 <img src="../../assets/profile/<?php echo $Doctor_data ['image'] ?>" width="70" class="rounded-circle" height="70px">
                     
                 </div>
 
-               <h6 class="mb-0"><?php echo $row['fullName'] ?></h6>
-                <small><?php echo $row['specialties'] ?></small>
+               <h6 class="mb-0"><?php echo $Doctor_data ['fullName'] ?></h6>
+                <small><?php echo $Doctor_data ['specialties'] ?></small>
 
                
 
                 <div class="mt-4 apointment d-flex justify-content-center gap-2">
 
-                  <a href="../../view/patient/doctor-details-patient.php?id=<?php echo $row['emailid']; ?>" class="btn btn-sm btn-primary">More</a>
-                   <a href="../../view/patient/record-problem.php?id=<?php echo $row['user_id'] ?>" class="btn btn-sm btn-success">Take Treatment</a>
+                  <a href="../../view/patient/doctor-details-patient.php?id=<?php echo $Doctor_data ['emailid']; ?>" class="btn btn-sm btn-primary">More</a>
+                   <a href="../../view/patient/record-problem.php?id=<?php echo $Doctor_data['user_id'] ?>" class="btn btn-sm btn-success">Take Treatment</a>
     
                 </div>
                
@@ -395,4 +402,4 @@ function showDoctors(suggestion) {
 </body>
 
 </html>
-<?php } ?>
+ 

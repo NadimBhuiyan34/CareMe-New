@@ -8,7 +8,7 @@ require 'includes/config.php';
  
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 	$api_key = escape_data($_POST["api_key"]);
-	$device = escape_data($_POST["device"]);
+	$user_id = escape_data($_POST["user_id"]);
         //print_r($_POST);
       
 	//MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
@@ -23,8 +23,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 		$bodytemp = escape_data($_POST["bodytem"]);
 		$bpm = escape_data($_POST["bpm"]);
 	    date_default_timezone_set('Asia/Dhaka');
-		$sql = "INSERT INTO sensordata(room_temperature,body_temperature,humidity,heart_rate,device,created_at) 
-			VALUES('".$temperature."','".$bodytemp."','".$humidity."','".$bpm."','".$device."','".date("Y-m-d H:i:s")."')";
+		$sql = "INSERT INTO sensordata(user_id,room_temperature,body_temperature,humidity,heart_rate,created_at) 
+			VALUES('".$user_id."','".$temperature."','".$bodytemp."','".$humidity."','".$bpm."','".date("Y-m-d H:i:s")."')";
 		 
 		if($con->query($sql) === FALSE)
 			{ echo "Error: " . $sql . "<br>" . $con->error; }

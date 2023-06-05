@@ -1,25 +1,43 @@
- <?php
+<?php
 session_start();
 
 include_once('../../includes/config.php');
-if($_SESSION['user']['role'] !='admin')
+$adid=$_SESSION['user']['id'];
+$role=$_SESSION['user']['role'];
+ if($role !='admin')
 {
          header('Location:../../pages-error.php');
          exit();
 }
-// $patientSql="SELECT * FROM `tbluserregistration` WHERE role =='patient'";
-$doctorSql="SELECT *
-     FROM tbluserregistration
-     JOIN doctor_profiles ON tbluserregistration.id = doctor_profiles.user_id WHERE role = 'doctor' ORDER BY regDate DESC";
-$users= mysqli_query($con, $doctorSql);
+ 
+if(isset($_POST['delete']))
+{
+         $id=$_POST['id'];
+         $deleteSql="DELETE FROM `tbluserregistration` WHERE id = $id";
+         $deleteConfirm= mysqli_query($con, $deleteSql);
+
+             $_SESSION['success'] = array('message' => "Doctor Delete Successfull",'type' => "success",'icon'=>"fa-triangle-exclamation");
+      // Redirect to some page where you want to show the success message
+      header("Location:../../view/admin/doctor-index.php");
+      exit();
+}
 
  
 
-if (strlen($_SESSION['user']['id']) == 0) {
+if ($adid == 0) {
        header('Location:../../logout.php');
   exit();
 }
+ 
+// $patientSql="SELECT * FROM `tbluserregistration` WHERE role =='patient'";
+$doctorSql1="SELECT *
+     FROM tbluserregistration
+     JOIN doctor_profiles ON tbluserregistration.id = doctor_profiles.user_id WHERE role = 'doctor' ORDER BY regDate DESC";
+$users= mysqli_query($con, $doctorSql1);
 
+ 
+
+ 
  
 ?>
 
@@ -83,8 +101,9 @@ if (strlen($_SESSION['user']['id']) == 0) {
    
       <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-          <li class="breadcrumb-item active">Dashboard</li>
+          <li class="breadcrumb-item"><a href="index.html"><i class="fa-solid fa-backward-fast"></i></a></li>
+          <li class="breadcrumb-item"><a href="index.html"><i class="fa-solid fa-rotate-left"></i></a></li>
+         
         </ol>
       </nav>
       
@@ -124,21 +143,28 @@ if (strlen($_SESSION['user']['id']) == 0) {
                     <tbody>
                        <?php while ($row = $users->fetch_assoc()) : ?>
                       <tr>
-                       
+                       1
                         <td><?php echo $row['fullName'] ?></td>
                         <td><?php echo $row['emailid'] ?></td>
                         <td><?php echo $row['mobile'] ?></td>
                         <td><?php echo $row['academic_title'] ?></td>
                         <td><?php echo $row['specialties'] ?></td>
                         <td><img src="../../assets/profile/<?php echo $row['image'] ?>" alt="" style="width:80px;height:80px"></td>
-                        <td> <span class="badge  <?php echo $row['is_varify'] == 1 ? 'text-bg-success' : 'text-bg-danger' ?>"><?php echo $row['is_varify']==1?'Active':'InActive' ?></span></td>
-                        <td class="d-flex">
-                             <a href="../../view/admin/doctor-details.php?id=<?php echo $row['emailid']; ?>" class="btn btn-sm btn-success">View</a>
-                         <a href="../../view/admin/doctor-edit.php?id=<?php echo $row['emailid']; ?>" class="btn btn-sm btn-primary">Edit</a>
-                                      
-                        
-                           <a href="" class="btn btn-sm btn-danger">Delete</a>
-                        </td>
+                        <td class=""> <span class="badge  <?php echo $row['is_varify'] == 1 ? 'text-bg-success' : 'text-bg-danger' ?>"><?php echo $row['is_varify']==1?'Active':'InActive' ?></span></td>
+                    <td>
+  <div class="btn-group">
+    <a href="../../view/admin/doctor-details.php?id=<?php echo $row['emailid']; ?>" class="btn btn-sm btn-success me-1"><i class="fa-solid fa-eye"></i></a>
+    <a href="../../view/admin/doctor-edit.php?id=<?php echo $row['emailid']; ?>" class="btn btn-sm btn-primary me-1"><i class="fa-solid fa-pen-to-square"></i></a>
+    <form action="" method="POST">
+      <input type="hidden" name="id" value="<?php echo $row['user_id']; ?>">
+      <button class="btn btn-sm btn-danger" type="submit" name="delete">
+             <i class="bi bi-trash"></i> 
+      </button>
+
+    </form>
+  </div>
+</td>
+
                       </tr>
                        <?php endwhile; ?>
                        
@@ -178,19 +204,19 @@ if (strlen($_SESSION['user']['id']) == 0) {
                 <h6 class="mb-0"><?php echo $row['fullName'] ?></h6>
                 <small><?php echo $row['specialties'] ?></small>
 
-                <div class="ratings mt-2">
-
-                    <i class="fa fa-star"></i>
-                    <i class="fa fa-star"></i>
-                    <i class="fa fa-star"></i>
-                    <i class="fa fa-star"></i>
-                    
-                </div>
+                
 
                 <div class="mt-4 apointment d-flex justify-content-center gap-2">
 
-                   <a href="../../view/admin/doctor-details.php?id=<?php echo $row['emailid']; ?>" class="btn btn-sm btn-primary">More</a>
- <a href="../../view/admin/doctor-edit.php?id=<?php echo $row['emailid']; ?>" class="btn btn-sm btn-primary">Edit</a>
+                   <a href="../../view/admin/doctor-details.php?id=<?php echo $row['emailid']; ?>" class="btn btn-sm btn-success"><i class="fa-solid fa-eye"></i></a>
+<a href="../../view/admin/doctor-edit.php?id=<?php echo $row['emailid']; ?>" class="btn btn-sm btn-primary me-1"><i class="fa-solid fa-pen-to-square"></i></a>
+    <form action="" method="POST">
+      <input type="hidden" name="id" value="<?php echo $row['user_id']; ?>">
+      <button class="btn btn-sm btn-danger" type="submit" name="delete">
+             <i class="bi bi-trash"></i> 
+      </button>
+
+    </form>
     
                 </div>
                 <!-- More  -->

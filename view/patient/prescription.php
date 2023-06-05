@@ -2,15 +2,22 @@
 session_start();
  
 include_once('../../includes/config.php');
- if($_SESSION['user']['role'] !='patient')
+$adid=$_SESSION['user']['id'];
+$role=$_SESSION['user']['role'];
+ 
+ if($role !='patient')
 {
          header('Location:../../pages-error.php');
          exit();
 }
-if (strlen($_SESSION['user']['id']==0)) {
- header('Location:../../logout.php');
-  } else{
+ 
 
+ 
+
+if ($adid == 0) {
+       header('Location:../../logout.php');
+  exit();
+}
 ?>
 
 <!DOCTYPE html>
@@ -85,31 +92,15 @@ if (strlen($_SESSION['user']['id']==0)) {
       
 <div class="row g-2 mx-auto mx-md-0">
 
-
-<div class="col-md-3 col-6 col-xl-3 col-sm-6 mx-auto">
-
-    <div class="card p-2 py-3 text-center border-left-info mx-auto">
-
-        <div class="img mb-2">
-
-        <i class="fa-solid fa-file-prescription fa-bounce fa-2xl" style="color: #f91a5d;"></i>
-            
-        </div>
-
-            <h6 style="color:#041f8a">PS-1236</h6>
-            <small>Nadim Bhuiyan</small>
-            <p>12 June 2023</p>
-
-        
-        <div class="mt-1 apointment d-flex justify-content-center gap-2">
-
-            <!-- <a href="" class="btn btn-info btn-sm "><i class="fa-regular fa-eye"></i></a> -->
-            <a href="prescription-pdf.php" class="btn btn-success btn-sm "><i class="fa-solid fa-download"></i></a>
-           
-        </div>
-    </div>
-</div>
-<div class="col-md-3 col-6 col-xl-3 col-sm-6">
+    <?php 
+ 
+           $presSql="SELECT *
+     FROM prescriptions
+      WHERE user_id = $adid ORDER BY created_at DESC";
+     $presQuery= mysqli_query($con,$presSql);
+     while ($prescriptionData = $presQuery->fetch_assoc()) :  
+    ?>
+<div class="col-md-3 col-6 col-xl-3 col-sm-6 ">
 
     <div class="card p-2 py-3 text-center border-left-info">
 
@@ -119,66 +110,31 @@ if (strlen($_SESSION['user']['id']==0)) {
             
         </div>
 
-            <h6 style="color:#041f8a">PS-1236</h6>
-            <small>Nadim Bhuiyan</small>
-            <p>12 June 2023</p>
+            <h6 style="color:#041f8a">PS-<?php echo $prescriptionData ['id'] ?></h6>
+           <?php 
+             $doctor_id=$prescriptionData['doctor_id'];
+           
+           $doctorSql="SELECT * FROM `tbluserregistration` WHERE id= $doctor_id";
+               $doctorQuery= mysqli_query($con, $doctorSql);
+              while ($doctorData =  $doctorQuery->fetch_assoc()) :  
+           ?>
+            <small><?php echo $doctorData['fullName'] ?></small>
+              <?php endwhile; ?>
+            <p><?php echo date('j F Y', strtotime($prescriptionData['created_at'])); ?></p>
+
 
         
         <div class="mt-1 apointment d-flex justify-content-center gap-2">
 
             <!-- <a href="" class="btn btn-info btn-sm "><i class="fa-regular fa-eye"></i></a> -->
-            <a href="prescription-pdf.php" class="btn btn-success btn-sm "><i class="fa-solid fa-download"></i></a>
+            <a href="prescription-pdf.php?id=<?php echo $prescriptionData['id'] ?>" class="btn btn-success btn-sm ">PDF View</i></a>
            
         </div>
     </div>
+ 
 </div>
-<div class="col-md-3 col-6 col-xl-3 col-sm-6 mx-auto">
-
-    <div class="card p-2 py-3 text-center border-left-info mx-auto">
-
-        <div class="img mb-2">
-
-        <i class="fa-solid fa-file-prescription fa-bounce fa-2xl" style="color: #f91a5d;"></i>
-            
-        </div>
-
-            <h6 style="color:#041f8a">PS-12366</h6>
-            <small>Rahim Bhuiyan</small>
-            <p>13 June 2023</p>
-
-        
-        <div class="mt-1 apointment d-flex justify-content-center gap-2">
-
-            <!-- <a href="" class="btn btn-info btn-sm "><i class="fa-regular fa-eye"></i></a> -->
-            <a href="prescription-pdf.php" class="btn btn-success btn-sm "><i class="fa-solid fa-download"></i></a>
-           
-        </div>
-    </div>
-</div>
-<div class="col-md-3 col-6 col-xl-3 col-sm-6">
-
-    <div class="card p-2 py-3 text-center border-left-info">
-
-        <div class="img mb-2">
-
-        <i class="fa-solid fa-file-prescription fa-bounce fa-2xl" style="color: #f91a5d;"></i>
-            
-        </div>
-
-            <h6 style="color:#041f8a">PS-1236</h6>
-            <small>Nadim Bhuiyan</small>
-            <p>12 June 2023</p>
-
-        
-        <div class="mt-1 apointment d-flex justify-content-center gap-2">
-
-            <!-- <a href="" class="btn btn-info btn-sm "><i class="fa-regular fa-eye"></i></a> -->
-            <a href="prescription-pdf.php" class="btn btn-success btn-sm "><i class="fa-solid fa-download"></i></a>
-           
-        </div>
-    </div>
-</div>
-</div>
+    <?php endwhile; ?>
+ 
 
 
     </section>
@@ -218,4 +174,4 @@ if (strlen($_SESSION['user']['id']==0)) {
 </body>
 
 </html>
-<?php } ?>
+ 

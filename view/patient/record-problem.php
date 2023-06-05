@@ -3,7 +3,8 @@ session_start();
 require '../../vendor/autoload.php';
 
 include_once('../../includes/config.php');
-
+$adid=$_SESSION['user']['id'];
+$role=$_SESSION['user']['role'];
 if(isset($_POST['submit']))
 {
 
@@ -31,7 +32,7 @@ $doctor_id=$_POST['doctor_id'];
 $patient_id=$_SESSION['user']['id'];
  $audioFilename = $_FILES['audio']['name']??'';
  $imageFilename = $_FILES['image']['name']??'';
-$prescriptionSql="INSERT INTO `prescriptions`(`patient_id`,`doctor_id`, `image`, `audio`, `problem`) VALUES ('$patient_id','$doctor_id','$imageFilename','$audioFilename','$problem')";
+$prescriptionSql="INSERT INTO `problems`(`patient_id`,`doctor_id`, `image`, `audio`, `problem`) VALUES ('$patient_id','$doctor_id','$imageFilename','$audioFilename','$problem')";
 
 if(mysqli_query($con, $prescriptionSql))
 {
@@ -44,7 +45,7 @@ if(mysqli_query($con, $prescriptionSql))
 }
 else
 {
-       session_start(); 
+      
      $_SESSION['success'] = array('message' => "Submited Fail!",'type' => "danger",'icon'=>"fa-triangle-exclamation");
 
       // Redirect to some page where you want to show the success message
@@ -55,16 +56,20 @@ else
 }
 
 
- if($_SESSION['user']['role'] !='patient')
+ 
+ if($role !='patient')
 {
          header('Location:../../pages-error.php');
          exit();
 }
+ 
 
-if (strlen($_SESSION['user']['id']==0)) {
-  header('Location:../../logout.php');
-  } else{
+ 
 
+if ($adid == 0) {
+       header('Location:../../logout.php');
+  exit();
+}
 ?>
 
 <!DOCTYPE html>
@@ -315,4 +320,4 @@ if (strlen($_SESSION['user']['id']==0)) {
 </body>
 
 </html>
-<?php } ?>
+ 

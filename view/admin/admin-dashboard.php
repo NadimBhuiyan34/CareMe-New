@@ -2,18 +2,21 @@
 session_start();
 
 include_once('../../includes/config.php');
-
-if($_SESSION['user']['role'] !='admin')
+$adid=$_SESSION['user']['id'];
+$role=$_SESSION['user']['role'];
+ if($role !='admin')
 {
          header('Location:../../pages-error.php');
          exit();
 }
+ 
 
-if (strlen($_SESSION['user']['id']) == 0) {
+ 
+
+if ($adid == 0) {
        header('Location:../../logout.php');
   exit();
 }
-
  
 ?>
 
@@ -77,7 +80,7 @@ if (strlen($_SESSION['user']['id']) == 0) {
    
       <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+           
           <li class="breadcrumb-item active">Dashboard</li>
         </ol>
       </nav>
@@ -97,6 +100,17 @@ if (strlen($_SESSION['user']['id']) == 0) {
           <div class="row">
 
             <!-- Sales Card -->
+
+            <?php 
+                 $patientSql="SELECT * FROM tbluserregistration WHERE role = 'patient'" ;
+                    $patientResult = mysqli_query($con, $patientSql);
+                  $patientCount = mysqli_num_rows($patientResult);
+
+                  $patientActive="SELECT * FROM tbluserregistration WHERE role = 'patient' AND is_varify = 1" ;
+                   $activeResult1 = mysqli_query($con, $patientActive);
+                  $activeCountP = mysqli_num_rows($activeResult1);
+                 
+            ?>
             <div class="col-xxl-4 col-md-6">
               <div class="card info-card sales-card">
 
@@ -104,25 +118,26 @@ if (strlen($_SESSION['user']['id']) == 0) {
                   <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
                   <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
                     <li class="dropdown-header text-start">
-                      <h6>Filter</h6>
+                      <h6>More</h6>
                     </li>
 
-                    <li><a class="dropdown-item" href="#">Today</a></li>
-                    <li><a class="dropdown-item" href="#">This Month</a></li>
-                    <li><a class="dropdown-item" href="#">This Year</a></li>
+                    <li><a class="dropdown-item" href="../../view/admin/patient-registration.php">Patient Registration</a></li>
+                    <li><a class="dropdown-item" href="../../view/admin/patient-index.php">Patient List</a></li>
+                    
                   </ul>
                 </div>
 
                 <div class="card-body">
-                  <h5 class="card-title">Sales <span>| Today</span></h5>
+                  <h5 class="card-title">Total Patients</h5>
 
                   <div class="d-flex align-items-center">
                     <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                      <i class="bi bi-cart"></i>
+                      <i class="fa-solid fa-hospital-user"></i>
                     </div>
                     <div class="ps-3">
-                      <h6>145</h6>
-                      <span class="text-success small pt-1 fw-bold">12%</span> <span class="text-muted small pt-2 ps-1">increase</span>
+                      <h6><?php echo $patientCount ?></h6>
+                      
+                      <span class="text-success small pt-1 fw-bold"><?php echo $activeCountP ?></span> <span class="text-muted small pt-2 ps-1">Active</span>
 
                     </div>
                   </div>
@@ -134,7 +149,14 @@ if (strlen($_SESSION['user']['id']) == 0) {
             <!-- Revenue Card -->
             <div class="col-xxl-4 col-md-6">
               <div class="card info-card revenue-card">
-
+                       <?php 
+                 $doctorSql="SELECT * FROM tbluserregistration WHERE role = 'doctor'" ;
+                    $doctorResult = mysqli_query($con, $doctorSql);
+                  $doctorCount = mysqli_num_rows($doctorResult);
+                  $doctorActive="SELECT * FROM tbluserregistration WHERE role = 'doctor' AND is_varify = 1" ;
+                   $activeResult = mysqli_query($con, $doctorActive);
+                  $activeCount = mysqli_num_rows($activeResult);
+            ?>
                 <div class="filter">
                   <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
                   <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
@@ -142,22 +164,21 @@ if (strlen($_SESSION['user']['id']) == 0) {
                       <h6>Filter</h6>
                     </li>
 
-                    <li><a class="dropdown-item" href="#">Today</a></li>
-                    <li><a class="dropdown-item" href="#">This Month</a></li>
-                    <li><a class="dropdown-item" href="#">This Year</a></li>
+                   <li><a class="dropdown-item" href="../../view/admin/doctor-registration.php">Doctor Registration</a></li>
+                    <li><a class="dropdown-item" href="../../view/admin/doctor-index.php">Doctor List</a></li>
                   </ul>
                 </div>
 
                 <div class="card-body">
-                  <h5 class="card-title">Revenue <span>| This Month</span></h5>
+                  <h5 class="card-title">Total Doctors</h5>
 
                   <div class="d-flex align-items-center">
                     <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                      <i class="bi bi-currency-dollar"></i>
+                     <i class="fa-solid fa-user-doctor"></i>
                     </div>
                     <div class="ps-3">
-                      <h6>$3,264</h6>
-                      <span class="text-success small pt-1 fw-bold">8%</span> <span class="text-muted small pt-2 ps-1">increase</span>
+                      <h6><?php echo $doctorCount ?></h6>
+                      <span class="text-success small pt-1 fw-bold"><?php echo  $activeCount ?></span> <span class="text-muted small pt-2 ps-1">Active</span>
 
                     </div>
                   </div>
