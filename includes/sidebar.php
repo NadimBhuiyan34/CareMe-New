@@ -67,6 +67,16 @@
           <span>Requested Treatment</span>
         </a>
       </li><!-- End F.A.Q Page Nav -->
+      <li class="nav-item">
+  <form action="../../cleardata.php" method="POST" onsubmit="return confirm('Are you sure you want to clear data for this device?');" style="margin: 0;">
+    <input type="hidden" name="user_id" value="<?php echo $adid; ?>">
+    <button type="submit" class="nav-link w-100 text-center text-danger">
+      <i class="bi bi-trash me-2 text-danger"></i> Clear Data
+    </button>
+  </form>
+</li>
+
+
     <?php } 
          if($role=='admin')
          {

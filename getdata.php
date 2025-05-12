@@ -1,47 +1,25 @@
 <?php
 include_once('includes/config.php');
- 
 
- 
+if ($_SERVER["REQUEST_METHOD"] === "GET") {
+    if (isset($_GET['device_id']) && $_GET['device_id'] === "nadim") {
+        $sql = "SELECT * FROM sensordata ORDER BY created_at DESC LIMIT 1";
+        $result = mysqli_query($con, $sql);
 
-if($_SERVER["REQUEST_METHOD"] === "POST")
-{
+        if ($row = mysqli_fetch_assoc($result)) {
+            header('Content-Type: application/json');
+            echo json_encode($row);
+        } else {
+            echo json_encode(["error" => "No data found"]);
+        }
 
-  if($_POST['name'] === "nadim")
-  {
-    $sql = "SELECT * FROM sensordata";
-
-     
-    $result = mysqli_query($con, $sql);
-    // $row = mysqli_fetch_assoc($result);
-
-    while ($row = mysqli_fetch_assoc($result)) {
-     
-      $data[] = $row;
-      
+        mysqli_free_result($result);
+        mysqli_close($con);
+    } else {
+        http_response_code(403);
+        echo json_encode(["error" => "Unauthorized device_id"]);
     }
-
-    mysqli_free_result($result);
-    // Set the response content type to JSON
-    header('Content-Type: application/json');
-
-    // Send the JSON object back to the client
-    $jsonData = json_encode($data);
-    echo $jsonData;
-    mysqli_close($con);
-  }
-  else
-  {
-    http_response_code(404);
-    echo json_encode(["error"=>"Unathorize"]);
-  }
-  // Fetch the latest sensor data from the sensordata table
- 
-
-}
-else
-{
-  // http_response_code(405); // Method Not Allowed
-  echo json_encode(["error" => "Unsupported request method"]);
-  
+} else {
+    http_response_code(405);
+    echo json_encode(["error" => "Unsupported request method"]);
 }

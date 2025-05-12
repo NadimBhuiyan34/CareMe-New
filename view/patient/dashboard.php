@@ -18,6 +18,13 @@ if ($adid == 0) {
   exit();
 }
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+ 
+  $user_id = $_POST['user_id'] ?? '';
+  echo  $user_id ;
+ 
+}
  
 ?>
 
@@ -106,7 +113,7 @@ if ($adid == 0) {
 
                 
                     <div class="text-xs font-weight-bold text-primary  mb-1 text-center pt-2" style="font-size:14px">Room Temperature <br><span class="fs-5" id="room-temp"></span></div>
-                  
+                    <span style="font-size:10px" class="text-center" id="created_at"></span>
 
                  </div>
               </div><!-- End Sales Card -->
@@ -115,39 +122,35 @@ if ($adid == 0) {
 
                   
                     <div class="text-xs font-weight-bold text-primary  mb-1 text-center pt-2 " style="font-size:14px">Body Temperature <br><span class="fs-5" id="body-temp"></span></div>
-              
+                    <span style="font-size:10px" class="text-center" id="created_at2"></span>
 
                 </div>
               </div><!-- End Sales Card -->
               <div class="col-xxl-3 col-md-3 col-6">
                 <div class="card info-card sales-card shadow border-4 border-start border-primary">
-
-                  
-
-                
                    
                     <div class="text-xs font-weight-bold text-dark  mb-1 text-center pt-2" style="font-size:14px">Humidity <br><span class="fs-5 text-primary" id="humidity"></span></div>
-              
+                    <span style="font-size:10px" class="text-center" id="created_at3"></span>
 
                 </div>
               </div><!-- End Sales Card -->
               <div class="col-xxl-3 col-md-3 col-6">
                 <div class="card info-card sales-card shadow border-start border-4 border-danger">
 
-                  
-
-                 
                    
                     <div class="text-xs font-weight-bold text-primary  mb-1 text-center pt-2" style="font-size:14px">Heart Rate <br><span class="fs-5" id="heart-rate"></span></div>
-               
-
+                    <span style="font-size:10px" class="text-center" id="created_at4"></span>
+     
                 </div>
               </div><!-- End Sales Card -->
 
+             </div>
             
 
                  <div class="col-12 col-md-12 col-xl-12 col-sm-12 tableFixHead">
+                
                     <table id="example" class="table bg-white shadow rounded">
+                   
                         <thead class="table-dark " style="font-size:10px">
                             <tr>
                              <th style="cursor: default;">Room Temp</th>
@@ -173,7 +176,7 @@ $sensorQuery = mysqli_query($con, $sensor );
                             <td><?php echo $sensorData['humidity']; ?></td>
                             <td><?php echo $sensorData['body_temperature']; ?></td>
                             <td><?php echo $sensorData['heart_rate']; ?></td>
-                            <td><?php echo date("Y-m-d h:i: A", strtotime($sensorData['created_at'])); ?></td>
+                            <td><?php echo date("Y-m-d h:i A", strtotime($sensorData['created_at'])); ?></td>
                           </tr>
             <?php endwhile; ?>
                  </tbody>
@@ -221,28 +224,35 @@ $sensorQuery = mysqli_query($con, $sensor );
  
  
       <script src="../../assets/js/jquery-3.6.0.min.js"></script>
-  <script>
-     $(document).ready(function () {
-  fetchSensorData();
-});
-
-const apiUrl = "../../getdata.php";
-const device_id = "nadim"; // Replace with your device ID
-const params = `device_id=${encodeURIComponent(device_id)}`;
-
-function fetchSensorData() {
-  $.getJSON(`${apiUrl}?${params}`, function(data) {
-    // Update the values of the sensor data in the HTML elements
-    $("#room-temp").text(data.room_temperature);
-    $("#body-temp").text(data.body_temperature);
-    $("#humidity").text(data.humidity);
-    $("#heart-rate").text(data.heart_rate);
+      <script>
+  $(document).ready(function () {
+    fetchSensorData(); // initial load
+    setInterval(fetchSensorData, 2000); // every 2 seconds
   });
-}
 
-setInterval(fetchSensorData, 2000);
+  const apiUrl = "../../getdata.php";
+  const device_id = "nadim";
 
-     </script>   
+  function fetchSensorData() {
+    $.getJSON(`${apiUrl}?device_id=${device_id}`, function (data) {
+      if (data.error) {
+        console.error(data.error);
+        return;
+      }
+
+      // Update values in HTML
+      $("#room-temp").text(data.room_temperature);
+      $("#body-temp").text(data.body_temperature);
+      $("#humidity").text(data.humidity);
+      $("#heart-rate").text(data.heart_rate);
+      $("#created_at").text(data.created_at);
+      $("#created_at2").text(data.created_at);
+      $("#created_at3").text(data.created_at);
+      $("#created_at4").text(data.created_at);
+    });
+  }
+</script>
+
 
 
 
